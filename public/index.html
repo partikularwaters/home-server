@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HomeServer — Parts for local servers</title>
+<style>
+  :root { --ink:#111; --mut:#555; --line:#ddd; --blue:#0066c0; --zebra:#f7f7f7; }
+  * { box-sizing:border-box; }
+  html, body { height:100%; }
+  body {
+    margin:0; background:#fff; color:var(--ink);
+    font:14px/1.45 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    display:flex; flex-direction:column; height:100dvh; overflow:hidden;
+  }
+  header.top {
+    display:flex; align-items:center; gap:14px;
+    padding:10px 18px; border-bottom:2px solid var(--ink); flex:none;
+    min-height:58px;
+  }
+  .logo { font-weight:800; font-size:19px; letter-spacing:-.02em; text-decoration:none; color:var(--ink); }
+  .tag { color:var(--mut); font-size:13px; }
+  .tag svg { vertical-align:-4px; margin-left:5px; }
+  .spacer { flex:1; }
+  .cartbtn {
+    font:inherit; font-weight:700; background:#fff; cursor:pointer;
+    border:2px solid var(--ink); border-radius:6px; padding:6px 14px;
+  }
+  .cartbtn:hover { background:var(--ink); color:#fff; }
+  .checkoutbtn {
+    font:inherit; font-weight:700; background:var(--ink); color:#fff; cursor:pointer;
+    border:2px solid var(--ink); border-radius:6px; padding:6px 14px; text-decoration:none;
+  }
+  .checkoutbtn:hover { background:#fff; color:var(--ink); }
+  main {
+    flex:1; overflow:hidden; padding:12px 18px;
+    max-width:1060px; width:100%; margin:0 auto;
+  }
+  h1 { font-size:20px; margin:2px 0; }
+  .sub { color:var(--mut); font-size:13px; margin:0 0 10px; }
+  table.prod { width:100%; border-collapse:collapse; }
+  table.prod th {
+    text-align:left; font-size:11px; text-transform:uppercase;
+    letter-spacing:.07em; color:var(--mut);
+    border-bottom:2px solid var(--ink); padding:7px 10px;
+  }
+  table.prod td { border-bottom:1px solid var(--line); padding:8px 10px; vertical-align:middle; }
+  table.prod tr:nth-child(even) td { background:var(--zebra); }
+  .pname { font-weight:700; }
+  .spec { color:var(--mut); font-size:13px; }
+  .price { font-variant-numeric:tabular-nums; font-weight:700; white-space:nowrap; }
+  .thumb { width:56px; }
+  .thumb svg { display:block; width:44px; height:44px; }
+  .add {
+    font:inherit; font-size:13px; font-weight:700; color:#fff; white-space:nowrap;
+    background:var(--blue); border:none; border-radius:5px; padding:7px 14px; cursor:pointer;
+  }
+  .add:hover { background:#004e92; }
+  footer.bot {
+    flex:none; border-top:1px solid var(--line); padding:7px 18px;
+    font-size:12px; color:var(--mut);
+    display:flex; gap:16px; justify-content:space-between;
+  }
+  footer.bot a { color:var(--blue); }
+  /* setup banner (missing config) */
+  .banner {
+    background:#fff8e1; border:1px solid #d9a400; border-radius:6px;
+    padding:10px 14px; font-size:13px; margin-bottom:10px;
+  }
+  .banner code { background:#fff; padding:1px 6px; border-radius:4px; }
+  /* cart drawer */
+  .scrim { position:fixed; inset:0; background:rgba(0,0,0,.35);
+           opacity:0; pointer-events:none; transition:opacity .18s; }
+  body.cart-open .scrim { opacity:1; pointer-events:auto; }
+  .drawer {
+    position:fixed; top:0; right:0; bottom:0; width:min(380px,94vw);
+    background:#fff; border-left:2px solid var(--ink);
+    transform:translateX(103%); transition:transform .2s ease;
+    display:flex; flex-direction:column;
+  }
+  body.cart-open .drawer { transform:none; }
+  .drawer header { display:flex; justify-content:space-between; align-items:center;
+                   padding:12px 16px; border-bottom:2px solid var(--ink); }
+  .drawer h2 { margin:0; font-size:16px; }
+  .x { background:none; border:none; font-size:20px; cursor:pointer; line-height:1; }
+  .ditems { flex:1; overflow:auto; padding:6px 16px; }
+  .cline { display:flex; align-items:center; gap:8px; padding:8px 0;
+           border-bottom:1px solid var(--line); font-size:13px; }
+  .cline .nm { flex:1; }
+  .cline .nm small { display:block; color:var(--mut); }
+  .qty { display:flex; align-items:center; gap:6px; }
+  .qty button { width:24px; height:24px; border:1px solid var(--ink);
+                background:#fff; border-radius:4px; cursor:pointer; font-weight:700; }
+  .dfoot { border-top:2px solid var(--ink); padding:12px 16px; }
+  .total { display:flex; justify-content:space-between; font-weight:800;
+           font-size:15px; margin-bottom:10px; font-variant-numeric:tabular-nums; }
+  .go {
+    display:block; width:100%; text-align:center; text-decoration:none;
+    font:inherit; font-size:15px; font-weight:800; color:#fff;
+    background:var(--ink); border:none; border-radius:6px; padding:12px; cursor:pointer;
+  }
+  .clear {
+    display:block; width:100%; margin-top:10px; font:inherit; font-size:13px;
+    color:var(--mut); background:none; border:none; cursor:pointer; text-decoration:underline;
+  }
+  .clear:hover { color:#b00020; }
+  .empty { color:var(--mut); font-size:13px; padding:16px 0; }
+  @media (max-width:620px) { .spec { display:none; } .tag { display:none; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="logo" href="index.html">HomeServer</a>
+  <div class="tag">Parts for local servers. Definitely not for open-weight models.<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="#555" stroke-width="1.6"/><circle cx="8.6" cy="10.2" r="1.5" fill="#555"/><path d="M14.5 10.2 q3 0 3.4 2.2 q-0.4 2.2 -3.4 2.2" fill="none" stroke="#555" stroke-width="1.6"/><path d="M7.8 15.8 q4.2 3 8.4 0" fill="none" stroke="#555" stroke-width="1.6"/></svg></div>
+  <div class="spacer"></div>
+  <a class="checkoutbtn" href="checkout.html">Checkout →</a>
+  <button class="cartbtn" id="cartbtn" onclick="toggleCart(true)">Cart (<span id="ccount">0</span>)</button>
+</header>
+
+<main>
+  <h1>Server parts</h1>
+  <p class="sub">GPUs, boards, storage, power. For homelabs. In stock, ships fast.</p>
+  <div id="banner-slot"></div>
+  <table class="prod" id="ptable" aria-label="Products">
+    <thead><tr><th></th><th>Product</th><th>Spec</th><th>Price</th><th></th></tr></thead>
+    <tbody id="prows"><tr><td colspan="5" class="spec">Loading catalog…</td></tr></tbody>
+  </table>
+</main>
+
+<footer class="bot">
+  <span>Demo store for a web security lesson. Not a real store.</span>
+  <span>AI Operations Specialist Training 2026 | Acosta &amp; Madrid</span>
+</footer>
+
+<div class="scrim" onclick="toggleCart(false)"></div>
+<aside class="drawer" aria-label="Cart">
+  <header><h2>Cart</h2><button class="x" onclick="toggleCart(false)" aria-label="Close">×</button></header>
+  <div class="ditems" id="ditems"></div>
+  <div class="dfoot">
+    <div class="total"><span>Total</span><span id="ctotal">$0.00</span></div>
+    <a class="go" href="checkout.html">Checkout →</a>
+    <button class="clear" onclick="clearCart()">Clear cart</button>
+  </div>
+</aside>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+/* HomeServer storefront. Products come from Supabase (the real prices live
+   on the server). The cart lives in localStorage (the browser). */
+
+var PRODUCTS = [];
+var CART = {}; // id -> qty
+
+function money(n) { return "$" + Number(n).toFixed(2); }
+
+function hasConfig() {
+  var c = window.HS_CONFIG;
+  return !!(c && c.supabaseUrl && c.supabaseUrl.indexOf("your-project") !== 0);
+}
+function sb() {
+  var c = window.HS_CONFIG;
+  return window.supabase.createClient(c.supabaseUrl, c.supabaseAnonKey);
+}
+function prod(id) {
+  for (var i = 0; i < PRODUCTS.length; i++) if (PRODUCTS[i].id === id) return PRODUCTS[i];
+  return null;
+}
+
+function showBanner(msg) {
+  document.getElementById("banner-slot").innerHTML =
+    '<div class="banner">' + (msg ||
+    'Supabase is not configured. Copy <code>config.example.js</code> to ' +
+    '<code>public/config.js</code> and fill in your project URL and anon key. ' +
+    'See README setup step 3.') + '</div>';
+}
+
+async function loadProducts() {
+  if (!hasConfig() || !window.supabase) { showBanner(); return; }
+  try {
+    var res = await sb().from("products").select("*").order("price", { ascending: false });
+    if (res.error) throw res.error;
+    PRODUCTS = res.data || [];
+    renderProducts(PRODUCTS);
+    renderCart(); // catalog just arrived: redraw the drawer so items appear
+  } catch (e) {
+    showBanner("Could not reach Supabase: " + e.message);
+  }
+}
+
+/* Called with the live catalog. Also callable from the console with any
+   array, which is handy for layout checks. */
+function renderProducts(list) {
+  var html = "";
+  for (var i = 0; i < list.length; i++) {
+    var p = list[i];
+    html += "<tr>" +
+      '<td class="thumb">' + thumb(p.id) + "</td>" +
+      '<td><span class="pname">' + esc(p.name) + "</span></td>" +
+      '<td class="spec">' + esc(p.spec) + "</td>" +
+      '<td class="price">' + money(p.price) + "</td>" +
+      '<td><button class="add" onclick="addToCart(\'' + p.id + "')\">Add</button></td>" +
+      "</tr>";
+  }
+  document.getElementById("prows").innerHTML = html || '<tr><td colspan="5" class="spec">No products.</td></tr>';
+}
+
+/* Minimal line-drawn product thumbnails, McMaster-catalog style.
+   Deliberately schematic: they read as "product photo slot" without
+   pretending to be photographs of the actual hardware. */
+function thumb(id) {
+  var s = 'fill="none" stroke="#111" stroke-width="2"';
+  var f = 'fill="#111"';
+  var open = '<svg viewBox="0 0 48 48" aria-hidden="true">';
+  var pic = {
+    rtx4090:
+      '<rect x="8" y="14" width="34" height="20" rx="2" ' + s + '/>' +
+      '<circle cx="19" cy="24" r="6" ' + s + '/>' +
+      '<circle cx="19" cy="24" r="1.6" ' + f + '/>' +
+      '<circle cx="33" cy="24" r="6" ' + s + '/>' +
+      '<circle cx="33" cy="24" r="1.6" ' + f + '/>' +
+      '<rect x="4" y="18" width="4" height="12" ' + f + '/>',
+    teslap40:
+      '<rect x="8" y="14" width="34" height="20" rx="2" ' + s + '/>' +
+      '<line x1="16" y1="14" x2="16" y2="34" ' + s + '/>' +
+      '<line x1="22" y1="14" x2="22" y2="34" ' + s + '/>' +
+      '<line x1="28" y1="14" x2="28" y2="34" ' + s + '/>' +
+      '<line x1="34" y1="14" x2="34" y2="34" ' + s + '/>' +
+      '<rect x="4" y="18" width="4" height="12" ' + f + '/>',
+    rpi5:
+      '<rect x="10" y="10" width="28" height="28" rx="2" ' + s + '/>' +
+      '<rect x="19" y="19" width="10" height="10" ' + s + '/>' +
+      '<circle cx="14" cy="32" r="1.6" ' + f + '/>' +
+      '<circle cx="34" cy="32" r="1.6" ' + f + '/>' +
+      '<line x1="16" y1="10" x2="16" y2="6" ' + s + '/>' +
+      '<line x1="22" y1="10" x2="22" y2="6" ' + s + '/>' +
+      '<line x1="28" y1="10" x2="28" y2="6" ' + s + '/>' +
+      '<line x1="34" y1="10" x2="34" y2="6" ' + s + '/>',
+    nvme4tb:
+      '<rect x="4" y="19" width="36" height="10" rx="1" ' + s + '/>' +
+      '<rect x="9" y="22" width="7" height="4" ' + f + '/>' +
+      '<rect x="20" y="22" width="7" height="4" ' + f + '/>' +
+      '<rect x="36" y="19" width="4" height="10" ' + f + '/>',
+    ddr5kit:
+      '<rect x="4" y="16" width="40" height="14" rx="1" ' + s + '/>' +
+      '<rect x="9" y="20" width="6" height="6" ' + f + '/>' +
+      '<rect x="19" y="20" width="6" height="6" ' + f + '/>' +
+      '<rect x="29" y="20" width="6" height="6" ' + f + '/>' +
+      '<line x1="4" y1="30" x2="44" y2="30" ' + s + '/>',
+    psu1600:
+      '<rect x="8" y="12" width="32" height="24" rx="2" ' + s + '/>' +
+      '<circle cx="24" cy="24" r="8" ' + s + '/>' +
+      '<circle cx="24" cy="24" r="2" ' + f + '/>' +
+      '<line x1="24" y1="16" x2="24" y2="20" ' + s + '/>' +
+      '<line x1="24" y1="28" x2="24" y2="32" ' + s + '/>' +
+      '<line x1="16" y1="24" x2="20" y2="24" ' + s + '/>' +
+      '<line x1="28" y1="24" x2="32" y2="24" ' + s + '/>'
+  };
+  return open + (pic[id] || '') + '</svg>';
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+
+/* ---- cart ---- */
+function loadCart() {
+  try { CART = JSON.parse(localStorage.getItem("hs_cart") || "{}"); }
+  catch (e) { CART = {}; }
+}
+function saveCart() { localStorage.setItem("hs_cart", JSON.stringify(CART)); }
+function cartCount() { var n = 0; for (var k in CART) n += CART[k]; return n; }
+function cartTotal() {
+  var t = 0;
+  for (var k in CART) { var p = prod(k); if (p) t += Number(p.price) * CART[k]; }
+  return Math.round(t * 100) / 100;
+}
+function addToCart(id) {
+  CART[id] = (CART[id] || 0) + 1;
+  saveCart(); renderCart();
+}
+function setQty(id, q) {
+  if (q <= 0) delete CART[id]; else CART[id] = q;
+  saveCart(); renderCart();
+}
+function clearCart() {
+  CART = {};
+  saveCart(); renderCart();
+}
+function renderCart() {
+  document.getElementById("ccount").textContent = cartCount();
+  var html = "", ids = Object.keys(CART);
+  if (!ids.length) html = '<div class="empty">Cart is empty. The GPUs are waiting.</div>';
+  for (var i = 0; i < ids.length; i++) {
+    var p = prod(ids[i]); if (!p) continue;
+    var q = CART[ids[i]];
+    html += '<div class="cline"><div class="nm">' + esc(p.name) +
+      "<small>" + money(p.price) + " each</small></div>" +
+      '<div class="qty"><button onclick="setQty(\'' + p.id + "'," + (q - 1) + ')">−</button>' +
+      "<span>" + q + "</span>" +
+      '<button onclick="setQty(\'' + p.id + "'," + (q + 1) + ')">+</button></div>' +
+      '<div class="price">' + money(Number(p.price) * q) + "</div></div>";
+  }
+  document.getElementById("ditems").innerHTML = html;
+  document.getElementById("ctotal").textContent = money(cartTotal());
+}
+function toggleCart(open) {
+  document.body.classList.toggle("cart-open", open);
+}
+
+loadCart();
+renderCart();
+loadProducts();
+</script>
+</body>
+</html>

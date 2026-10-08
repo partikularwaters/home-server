@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — HomeServer</title>
+<style>
+  :root { --ink:#111; --mut:#555; --line:#ddd; --blue:#0066c0; --zebra:#f7f7f7;
+          --ok:#0a7a2f; --bad:#b00020; }
+  * { box-sizing:border-box; }
+  html, body { height:100%; }
+  body {
+    margin:0; background:#fff; color:var(--ink);
+    font:14px/1.45 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    display:flex; flex-direction:column; height:100dvh; overflow:hidden;
+  }
+  /* demo mode bar: deliberately un-store-like */
+  .demobar {
+    flex:none; display:flex; align-items:center; gap:14px;
+    padding:8px 18px; color:#111;
+    background:repeating-linear-gradient(-45deg,#ffe08a,#ffe08a 14px,#ffd063 14px,#ffd063 28px);
+    border-bottom:2px solid var(--ink);
+  }
+  .dlabel { font-weight:800; font-size:12px; letter-spacing:.08em; }
+  .seg { display:flex; border:2px solid var(--ink); border-radius:6px; overflow:hidden; background:#fff; }
+  .seg button { font:inherit; font-weight:700; font-size:13px; border:none; background:#fff;
+                padding:6px 16px; cursor:pointer; }
+  .seg button.on { background:var(--ink); color:#fff; }
+  .dnote { font-size:12px; color:#4a3c00; }
+  header.top { flex:none; display:flex; align-items:center; gap:14px; padding:10px 18px; min-height:58px; }
+  .logo { font-weight:800; font-size:19px; letter-spacing:-.02em; text-decoration:none; color:var(--ink); }
+  .tag { color:var(--mut); font-size:13px; }
+  .tag svg { vertical-align:-4px; margin-left:5px; }
+  .spacer { flex:1; }
+  .crumb { color:var(--mut); font-size:13px; }
+  main {
+    flex:1; overflow:hidden; padding:6px 18px 12px;
+    max-width:1060px; width:100%; margin:0 auto;
+    display:grid; grid-template-columns:1fr 1fr; gap:26px; align-content:start;
+  }
+  h1 { font-size:20px; margin:4px 0 8px; grid-column:1 / -1; }
+  label { display:block; font-size:12px; font-weight:700; text-transform:uppercase;
+          letter-spacing:.06em; color:var(--mut); margin:10px 0 4px; }
+  input[type=text], input[type=email] {
+    font:inherit; width:100%; padding:9px 10px;
+    border:1px solid var(--ink); border-radius:5px;
+  }
+  .place {
+    font:inherit; font-size:15px; font-weight:800; color:#fff; width:100%;
+    background:var(--ink); border:none; border-radius:6px; padding:12px; margin-top:16px; cursor:pointer;
+  }
+  .place:hover { background:#333; }
+  .place:disabled { background:#999; cursor:wait; }
+  .result { margin-top:12px; padding:10px 14px; border-radius:6px; font-size:13px; display:none; }
+  .result.ok { display:block; background:#e7f6ec; border:1px solid var(--ok); }
+  .result.bad { display:block; background:#fdeef0; border:1px solid var(--bad); }
+  .result b { display:block; margin-bottom:2px; }
+  .result code { font-size:12px; word-break:break-all; }
+  table.sum { width:100%; border-collapse:collapse; }
+  table.sum th { text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.07em;
+                 color:var(--mut); border-bottom:2px solid var(--ink); padding:7px 10px; }
+  table.sum td { border-bottom:1px solid var(--line); padding:8px 10px; }
+  table.sum tr:nth-child(even) td { background:var(--zebra); }
+  .price { font-variant-numeric:tabular-nums; font-weight:700; white-space:nowrap; }
+  .gtotal td { font-weight:800; font-size:15px; border-top:2px solid var(--ink); }
+  .hint { font-size:12px; color:var(--mut); margin-top:8px; }
+  .empty { grid-column:1 / -1; color:var(--mut); padding:30px 0; }
+  .empty a { color:var(--blue); }
+  /* server panel */
+  #spanel { flex:none; border-top:2px solid var(--ink); background:#0d1117; color:#c9d1d9;
+            font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  .shead { display:flex; align-items:center; gap:10px; padding:6px 18px; cursor:pointer; user-select:none; }
+  .shead .t { font-size:12px; font-weight:700; letter-spacing:.06em; }
+  .shead .live { color:#3fb950; font-size:11px; }
+  .srefresh { margin-left:auto; font:inherit; font-size:11px; background:#161b22; color:#c9d1d9;
+              border:1px solid #30363d; border-radius:5px; padding:4px 10px; cursor:pointer; }
+  .srefresh:hover { background:#21262d; }
+  .sbody { max-height:0; overflow:hidden; transition:max-height .2s ease; }
+  #spanel.open .sbody { max-height:34vh; overflow:auto; }
+  table.srv { width:100%; border-collapse:collapse; font-size:12px; }
+  table.srv th { text-align:left; color:#8b949e; font-weight:400; padding:6px 18px 4px;
+                 border-bottom:1px solid #30363d; position:sticky; top:0; background:#0d1117; }
+  table.srv td { padding:5px 18px; border-bottom:1px solid #161b22; vertical-align:top; }
+  .badge { display:inline-block; font-size:10px; font-weight:700; letter-spacing:.05em;
+           border-radius:4px; padding:2px 7px; }
+  .b-hidden { background:#f85149; color:#fff; }
+  .b-protected { background:#3fb950; color:#06230f; }
+  .st-ok { color:#3fb950; } .st-bad { color:#f85149; }
+  @media (max-width:700px) { main { grid-template-columns:1fr; overflow:auto; } .tag { display:none; } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a class="logo" href="index.html">HomeServer</a>
+  <div class="tag">Parts for local servers. Definitely not for open-weight models.<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="#555" stroke-width="1.6"/><circle cx="8.6" cy="10.2" r="1.5" fill="#555"/><path d="M14.5 10.2 q3 0 3.4 2.2 q-0.4 2.2 -3.4 2.2" fill="none" stroke="#555" stroke-width="1.6"/><path d="M7.8 15.8 q4.2 3 8.4 0" fill="none" stroke="#555" stroke-width="1.6"/></svg></div>
+  <div class="spacer"></div>
+  <span class="crumb">Checkout</span>
+</header>
+
+<div class="demobar">
+  <span class="dlabel">DEMO MODE</span>
+  <div class="seg" role="group" aria-label="Demo mode">
+    <button id="m-hidden" class="on" onclick="setMode('hidden')">Hidden</button><button id="m-protected" onclick="setMode('protected')">Protected</button>
+  </div>
+  <span class="dnote">Not a store feature. Picks which order table the checkout writes to.</span>
+</div>
+
+<main id="main"></main>
+
+<section id="spanel" aria-label="Server view">
+  <div class="shead" onclick="toggleServer()">
+    <span id="schev">▸</span>
+    <span class="t">SERVER VIEW</span>
+    <span class="live">● live from Supabase</span>
+    <button class="srefresh" id="srefresh" onclick="event.stopPropagation();refreshServer()">Refresh</button>
+  </div>
+  <div class="sbody"><table class="srv" id="stable">
+    <thead><tr><th>time</th><th>table</th><th>customer</th><th>items</th><th>total</th><th>status</th></tr></thead>
+    <tbody id="srows"><tr><td colspan="6" style="color:#8b949e">Expand to inspect what the server actually stored.</td></tr></tbody>
+  </table></div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script>
+/* HomeServer checkout.
+   The toggle picks the target table:
+     hidden    -> orders_vuln : accepts whatever total the browser claims
+     protected -> orders      : BEFORE INSERT trigger re-checks the price
+   The "server view" panel reads both tables straight from Supabase. */
+
+var MODE = "hidden";
+var PRODUCTS = {}; // id -> {name, price}
+var CART = {};
+
+function money(n) { return "$" + Number(n).toFixed(2); }
+function esc(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function hasConfig() {
+  var c = window.HS_CONFIG;
+  return !!(c && c.supabaseUrl && c.supabaseUrl.indexOf("your-project") !== 0);
+}
+function sb() {
+  var c = window.HS_CONFIG;
+  return window.supabase.createClient(c.supabaseUrl, c.supabaseAnonKey);
+}
+function tableFor(mode) { return mode === "hidden" ? "orders_vuln" : "orders"; }
+
+function toggleServer() {
+  var p = document.getElementById("spanel");
+  p.classList.toggle("open");
+  document.getElementById("schev").textContent = p.classList.contains("open") ? "▾" : "▸";
+}
+
+function setMode(m) {
+  MODE = m;
+  document.getElementById("m-hidden").classList.toggle("on", m === "hidden");
+  document.getElementById("m-protected").classList.toggle("on", m === "protected");
+  hideResult();
+}
+
+function cartItems() {
+  var out = [];
+  for (var id in CART) if (PRODUCTS[id]) out.push({ id: id, qty: CART[id] });
+  return out;
+}
+function cartTotal() {
+  var t = 0, items = cartItems();
+  for (var i = 0; i < items.length; i++)
+    t += Number(PRODUCTS[items[i].id].price) * items[i].qty;
+  return Math.round(t * 100) / 100;
+}
+
+function renderMain() {
+  var main = document.getElementById("main");
+  var items = cartItems();
+  if (!items.length) {
+    main.innerHTML = '<div class="empty">Your cart is empty. <a href="index.html">Back to the store →</a></div>';
+    return;
+  }
+  var rows = "";
+  for (var i = 0; i < items.length; i++) {
+    var p = PRODUCTS[items[i].id], q = items[i].qty;
+    rows += "<tr><td>" + esc(p.name) + " × " + q + "</td>" +
+            '<td class="price">' + money(Number(p.price) * q) + "</td></tr>";
+  }
+  main.innerHTML =
+    "<h1>Checkout</h1>" +
+    '<div><label for="cname">Name</label><input type="text" id="cname" autocomplete="name" placeholder="Ada Lovelace">' +
+    '<label for="cemail">Email</label><input type="email" id="cemail" autocomplete="email" placeholder="ada@example.com">' +
+    '<input type="hidden" id="order_total" value="' + cartTotal().toFixed(2) + '">' +
+    '<button class="place" id="placebtn" onclick="placeOrder()">Place order — <span id="btntotal">' +
+    money(cartTotal()) + "</span></button>" +
+    '<div class="result" id="result"></div>' +
+    '<p class="hint">The total lives in a hidden field. The browser can see it, ' +
+    'which means the customer can change it.</p></div>' +
+    '<div><table class="sum"><thead><tr><th>Item</th><th>Price</th></tr></thead><tbody>' + rows +
+    '<tr class="gtotal"><td>Total</td><td class="price">' + money(cartTotal()) + "</td></tr>" +
+    "</tbody></table></div>";
+}
+
+function showResult(ok, title, body) {
+  var r = document.getElementById("result");
+  r.className = "result " + (ok ? "ok" : "bad");
+  r.innerHTML = "<b>" + esc(title) + "</b><div>" + body + "</div>";
+}
+function hideResult() {
+  var r = document.getElementById("result");
+  if (r) r.className = "result";
+}
+
+async function placeOrder() {
+  var btn = document.getElementById("placebtn");
+  var name = document.getElementById("cname").value.trim();
+  var email = document.getElementById("cemail").value.trim();
+  if (!name || !email) { showResult(false, "Missing details", "Name and email are required."); return; }
+
+  var claimed = Number(document.getElementById("order_total").value); // the hidden field: attacker-controlled
+  var items = cartItems().map(function (it) { return { id: it.id, qty: it.qty }; });
+  var table = tableFor(MODE);
+
+  btn.disabled = true; btn.textContent = "Placing order…";
+  try {
+    var res = await sb().from(table).insert({
+      customer: name, email: email, items: items, total: claimed
+    }).select("id");
+    if (res.error) throw res.error;
+    var oid = res.data[0].id;
+    // The screen stays put: the form, the cart, even the tampered total are
+    // untouched. Placing an order only sends; nothing re-renders. That keeps
+    // the demo flow to one motion: flip the toggle, submit again.
+    showResult(true, "Order recorded. Charged " + money(claimed) + ".",
+      "Order <code>" + esc(oid) + "</code> is now in the <code>" +
+      esc(table) + "</code> table. Check the server view below.");
+  } catch (e) {
+    showResult(false, "Rejected by the server.",
+      esc(e.message) + "<br>Nothing was written. " +
+      (MODE === "hidden"
+        ? "In Hidden mode there is no check, so a tampered total would have gone through."
+        : "In Protected mode the database re-checked the price and refused."));
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = 'Place order — <span id="btntotal">' + money(cartTotal()) + "</span>";
+    refreshServer();
+  }
+}
+
+/* ---- server view: what did the database actually store? ---- */
+async function refreshServer() {
+  var body = document.getElementById("srows");
+  if (!hasConfig()) {
+    body.innerHTML = '<tr><td colspan="6" style="color:#8b949e">Supabase not configured.</td></tr>';
+    return;
+  }
+  // No wipe here: the existing rows stay visible while fresh data loads,
+  // then swap atomically. Wiping first is what made the panel flash closed.
+  var live = document.querySelector("#spanel .live");
+  live.textContent = "● updating…";
+  try {
+    var c = sb();
+    var vh = await c.from("orders_vuln").select("*").order("created_at", { ascending: false }).limit(15);
+    var ph = await c.from("orders").select("*").order("created_at", { ascending: false }).limit(15);
+    if (vh.error) throw vh.error;
+    if (ph.error) throw ph.error;
+    var rows = [];
+    (vh.data || []).forEach(function (o) { o._mode = "hidden"; rows.push(o); });
+    (ph.data || []).forEach(function (o) { o._mode = "protected"; rows.push(o); });
+    rows.sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
+    if (!rows.length) {
+      body.innerHTML = '<tr><td colspan="6" style="color:#8b949e">No orders yet. Place one above.</td></tr>';
+      return;
+    }
+    var html = "";
+    for (var i = 0; i < rows.length; i++) {
+      var o = rows[i], items = o.items || [];
+      var desc = items.map(function (it) {
+        var p = PRODUCTS[it.id]; return (p ? p.name : it.id) + "×" + it.qty;
+      }).join(", ");
+      var tampered = false;
+      var real = 0;
+      for (var j = 0; j < items.length; j++) {
+        var pp = PRODUCTS[items[j].id];
+        if (pp) real += Number(pp.price) * items[j].qty;
+      }
+      real = Math.round(real * 100) / 100;
+      tampered = Math.abs(real - Number(o.total)) > 0.005;
+      html += "<tr><td>" + esc(o.created_at.slice(11, 19)) + "</td>" +
+        '<td><span class="badge ' + (o._mode === "hidden" ? "b-hidden" : "b-protected") + '">' +
+        o._mode.toUpperCase() + "</span></td>" +
+        "<td>" + esc(o.customer) + "</td>" +
+        "<td>" + esc(desc) + "</td>" +
+        '<td class="price">' + money(o.total) + "</td>" +
+        '<td class="' + (tampered ? "st-bad" : "st-ok") + '">' +
+        (tampered ? "TAMPERED (real: " + money(real) + ")" : "ok") + "</td></tr>";
+    }
+    body.innerHTML = html;
+    document.getElementById("spanel").classList.add("open");
+    document.getElementById("schev").textContent = "▾";
+  } catch (e) {
+    body.innerHTML = '<tr><td colspan="6" style="color:#f85149">read failed: ' + esc(e.message) + "</td></tr>";
+  } finally {
+    live.textContent = "● live from Supabase";
+  }
+}
+
+/* ---- boot ---- */
+(function init() {
+  try { CART = JSON.parse(localStorage.getItem("hs_cart") || "{}"); }
+  catch (e) { CART = {}; }
+  if (!hasConfig() || !window.supabase) {
+    document.getElementById("main").innerHTML =
+      '<div class="empty">Supabase is not configured. See README setup step 3.</div>';
+    return;
+  }
+  sb().from("products").select("*").then(function (res) {
+    if (res.error) {
+      document.getElementById("main").innerHTML =
+        '<div class="empty">Could not reach Supabase: ' + esc(res.error.message) + "</div>";
+      return;
+    }
+    (res.data || []).forEach(function (p) { PRODUCTS[p.id] = p; });
+    renderMain();
+    refreshServer();
+  });
+  document.getElementById("schev").textContent = "▸";
+})();
+</script>
+</body>
+</html>

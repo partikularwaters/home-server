@@ -1,0 +1,7 @@
+# Local secrets. Never commit these.
+public/config.js
+config.js
+
+# OS noise
+.DS_Store
+Thumbs.db
