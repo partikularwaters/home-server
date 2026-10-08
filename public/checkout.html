@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Checkout — HomeServer</title>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
 <style>
   :root { --ink:#111; --mut:#555; --line:#ddd; --blue:#0066c0; --zebra:#f7f7f7;
           --ok:#0a7a2f; --bad:#b00020; }
@@ -22,15 +23,25 @@
     border-bottom:2px solid var(--ink);
   }
   .dlabel { font-weight:800; font-size:12px; letter-spacing:.08em; }
-  .seg { display:flex; border:2px solid var(--ink); border-radius:6px; overflow:hidden; background:#fff; }
-  .seg button { font:inherit; font-weight:700; font-size:13px; border:none; background:#fff;
-                padding:6px 16px; cursor:pointer; }
-  .seg button.on { background:var(--ink); color:#fff; }
+  .seg { position:relative; display:flex; border:2px solid var(--ink); border-radius:6px; overflow:hidden; background:#fff; }
+  .seg button { font:inherit; font-weight:700; font-size:13px; border:none; background:#fff; padding:6px 16px;
+                cursor:pointer; color:var(--ink); transition:transform 160ms ease-out; }
+  .seg button:active { transform:scale(0.97); }
+  /* Duplicate active layer: black pill with white labels, clipped to the
+     active segment. Animating clip-path keeps the color swap seamless. */
+  .seg-slide { position:absolute; inset:2px; display:flex; background:var(--ink); border-radius:4px;
+               pointer-events:none; visibility:hidden;
+               transition:clip-path 200ms cubic-bezier(0.77, 0, 0.175, 1); }
+  .seg-slide span { font:inherit; font-weight:700; font-size:13px; padding:6px 16px; color:#fff; white-space:nowrap; }
+  @media (prefers-reduced-motion: reduce) {
+    .seg-slide, .seg button { transition:none; }
+  }
   .dnote { font-size:12px; color:#4a3c00; }
-  header.top { flex:none; display:flex; align-items:center; gap:14px; padding:10px 18px; min-height:58px; }
+  header.top { flex:none; display:flex; align-items:center; gap:14px; padding:10px 18px; min-height:58px; border-bottom:2px solid var(--ink); }
   .logo { font-weight:800; font-size:19px; letter-spacing:-.02em; text-decoration:none; color:var(--ink); }
+  .logo img { width:20px; height:20px; vertical-align:-3px; margin-right:7px; image-rendering:pixelated; }
   .tag { color:var(--mut); font-size:13px; }
-  .tag svg { vertical-align:-4px; margin-left:5px; }
+  .tag .wink svg { width:18px; height:18px; vertical-align:-4px; margin-left:3px; }
   .spacer { flex:1; }
   .crumb { color:var(--mut); font-size:13px; }
   main {
@@ -75,8 +86,10 @@
   .srefresh { margin-left:auto; font:inherit; font-size:11px; background:#161b22; color:#c9d1d9;
               border:1px solid #30363d; border-radius:5px; padding:4px 10px; cursor:pointer; }
   .srefresh:hover { background:#21262d; }
-  .sbody { max-height:0; overflow:hidden; transition:max-height .2s ease; }
-  #spanel.open .sbody { max-height:34vh; overflow:auto; }
+  .sbody { max-height:0; overflow:hidden; transition:max-height .25s ease; }
+  /* Fixed panel: table header + 8 order rows, whatever the content.
+     Stays put across refreshes and after the tables are reset. */
+  #spanel.open .sbody { max-height:268px; height:268px; overflow:auto; }
   table.srv { width:100%; border-collapse:collapse; font-size:12px; }
   table.srv th { text-align:left; color:#8b949e; font-weight:400; padding:6px 18px 4px;
                  border-bottom:1px solid #30363d; position:sticky; top:0; background:#0d1117; }
@@ -92,8 +105,8 @@
 <body>
 
 <header class="top">
-  <a class="logo" href="index.html">HomeServer</a>
-  <div class="tag">Parts for local servers. Definitely not for open-weight models.<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="#555" stroke-width="1.6"/><circle cx="8.6" cy="10.2" r="1.5" fill="#555"/><path d="M14.5 10.2 q3 0 3.4 2.2 q-0.4 2.2 -3.4 2.2" fill="none" stroke="#555" stroke-width="1.6"/><path d="M7.8 15.8 q4.2 3 8.4 0" fill="none" stroke="#555" stroke-width="1.6"/></svg></div>
+  <a class="logo" href="index.html"><img src="favicon.ico" alt="" width="20" height="20">HomeServer</a>
+  <div class="tag">Parts for local servers. Definitely not for open-weight models. <!-- wink: Madrid's pixel art --><span class="wink"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-label="Pixel-art winking smiley face"><title>Pixel wink</title><path fill="#000" d="M10 1h4v1h-4Z M7 2h10v1h-10Z M5 3h3v1h-3Z M16 3h3v1h-3Z M4 4h2v1h-2Z M18 4h2v1h-2Z M3 5h2v1h-2Z M19 5h2v1h-2Z M3 6h1v1h-1Z M7 6h2v1h-2Z M20 6h1v1h-1Z M2 7h2v1h-2Z M5 7h2v1h-2Z M20 7h2v1h-2Z M2 8h1v1h-1Z M21 8h1v1h-1Z M2 9h1v1h-1Z M8 9h2v1h-2Z M17 9h2v1h-2Z M21 9h1v1h-1Z M1 10h2v1h-2Z M7 10h3v1h-3Z M15 10h3v1h-3Z M21 10h2v1h-2Z M1 11h2v1h-2Z M7 11h3v1h-3Z M14 11h4v1h-4Z M21 11h2v1h-2Z M1 12h2v1h-2Z M8 12h2v1h-2Z M17 12h2v1h-2Z M21 12h2v1h-2Z M1 13h2v1h-2Z M21 13h2v1h-2Z M2 14h1v1h-1Z M21 14h1v1h-1Z M2 15h1v1h-1Z M8 15h2v1h-2Z M16 15h2v1h-2Z M21 15h1v1h-1Z M2 16h2v1h-2Z M9 16h3v1h-3Z M14 16h3v1h-3Z M20 16h2v1h-2Z M3 17h1v1h-1Z M11 17h4v1h-4Z M20 17h1v1h-1Z M3 18h2v1h-2Z M19 18h2v1h-2Z M4 19h2v1h-2Z M18 19h2v1h-2Z M5 20h3v1h-3Z M16 20h3v1h-3Z M7 21h10v1h-10Z M10 22h4v1h-4Z"/></svg></span></div>
   <div class="spacer"></div>
   <span class="crumb">Checkout</span>
 </header>
@@ -102,6 +115,7 @@
   <span class="dlabel">DEMO MODE</span>
   <div class="seg" role="group" aria-label="Demo mode">
     <button id="m-hidden" class="on" onclick="setMode('hidden')">Hidden</button><button id="m-protected" onclick="setMode('protected')">Protected</button>
+    <div class="seg-slide" id="segslide" aria-hidden="true"><span>Hidden</span><span>Protected</span></div>
   </div>
   <span class="dnote">Not a store feature. Picks which order table the checkout writes to.</span>
 </div>
@@ -159,7 +173,22 @@ function setMode(m) {
   document.getElementById("m-hidden").classList.toggle("on", m === "hidden");
   document.getElementById("m-protected").classList.toggle("on", m === "protected");
   hideResult();
+  moveSlide();
 }
+
+/* Active-segment overlay: clipped to the selected button, slides on toggle. */
+function moveSlide() {
+  var slide = document.getElementById("segslide");
+  var btn = document.querySelector(".seg button.on");
+  if (!slide || !btn) return;
+  var s = slide.getBoundingClientRect(), b = btn.getBoundingClientRect();
+  var left = Math.max(0, b.left - s.left), right = Math.max(0, s.right - b.right);
+  slide.style.clipPath = "inset(0px " + right.toFixed(1) + "px 0px " + left.toFixed(1) + "px round 4px)";
+  slide.style.visibility = "visible";
+}
+window.addEventListener("resize", moveSlide);
+window.addEventListener("load", moveSlide);
+moveSlide();
 
 function cartItems() {
   var out = [];

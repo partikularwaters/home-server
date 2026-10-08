@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HomeServer — Parts for local servers</title>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
 <style>
   :root { --ink:#111; --mut:#555; --line:#ddd; --blue:#0066c0; --zebra:#f7f7f7; }
   * { box-sizing:border-box; }
@@ -19,8 +20,9 @@
     min-height:58px;
   }
   .logo { font-weight:800; font-size:19px; letter-spacing:-.02em; text-decoration:none; color:var(--ink); }
+  .logo img { width:20px; height:20px; vertical-align:-3px; margin-right:7px; image-rendering:pixelated; }
   .tag { color:var(--mut); font-size:13px; }
-  .tag svg { vertical-align:-4px; margin-left:5px; }
+  .tag .wink svg { width:18px; height:18px; vertical-align:-4px; margin-left:3px; }
   .spacer { flex:1; }
   .cartbtn {
     font:inherit; font-weight:700; background:#fff; cursor:pointer;
@@ -50,7 +52,7 @@
   .spec { color:var(--mut); font-size:13px; }
   .price { font-variant-numeric:tabular-nums; font-weight:700; white-space:nowrap; }
   .thumb { width:56px; }
-  .thumb svg { display:block; width:44px; height:44px; }
+  .thumb img { display:block; width:44px; height:44px; object-fit:contain; }
   .add {
     font:inherit; font-size:13px; font-weight:700; color:#fff; white-space:nowrap;
     background:var(--blue); border:none; border-radius:5px; padding:7px 14px; cursor:pointer;
@@ -111,8 +113,8 @@
 <body>
 
 <header class="top">
-  <a class="logo" href="index.html">HomeServer</a>
-  <div class="tag">Parts for local servers. Definitely not for open-weight models.<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="9.5" fill="none" stroke="#555" stroke-width="1.6"/><circle cx="8.6" cy="10.2" r="1.5" fill="#555"/><path d="M14.5 10.2 q3 0 3.4 2.2 q-0.4 2.2 -3.4 2.2" fill="none" stroke="#555" stroke-width="1.6"/><path d="M7.8 15.8 q4.2 3 8.4 0" fill="none" stroke="#555" stroke-width="1.6"/></svg></div>
+  <a class="logo" href="index.html"><img src="favicon.ico" alt="" width="20" height="20">HomeServer</a>
+  <div class="tag">Parts for local servers. Definitely not for open-weight models. <!-- wink: Madrid's pixel art --><span class="wink"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-label="Pixel-art winking smiley face"><title>Pixel wink</title><path fill="#000" d="M10 1h4v1h-4Z M7 2h10v1h-10Z M5 3h3v1h-3Z M16 3h3v1h-3Z M4 4h2v1h-2Z M18 4h2v1h-2Z M3 5h2v1h-2Z M19 5h2v1h-2Z M3 6h1v1h-1Z M7 6h2v1h-2Z M20 6h1v1h-1Z M2 7h2v1h-2Z M5 7h2v1h-2Z M20 7h2v1h-2Z M2 8h1v1h-1Z M21 8h1v1h-1Z M2 9h1v1h-1Z M8 9h2v1h-2Z M17 9h2v1h-2Z M21 9h1v1h-1Z M1 10h2v1h-2Z M7 10h3v1h-3Z M15 10h3v1h-3Z M21 10h2v1h-2Z M1 11h2v1h-2Z M7 11h3v1h-3Z M14 11h4v1h-4Z M21 11h2v1h-2Z M1 12h2v1h-2Z M8 12h2v1h-2Z M17 12h2v1h-2Z M21 12h2v1h-2Z M1 13h2v1h-2Z M21 13h2v1h-2Z M2 14h1v1h-1Z M21 14h1v1h-1Z M2 15h1v1h-1Z M8 15h2v1h-2Z M16 15h2v1h-2Z M21 15h1v1h-1Z M2 16h2v1h-2Z M9 16h3v1h-3Z M14 16h3v1h-3Z M20 16h2v1h-2Z M3 17h1v1h-1Z M11 17h4v1h-4Z M20 17h1v1h-1Z M3 18h2v1h-2Z M19 18h2v1h-2Z M4 19h2v1h-2Z M18 19h2v1h-2Z M5 20h3v1h-3Z M16 20h3v1h-3Z M7 21h10v1h-10Z M10 22h4v1h-4Z"/></svg></span></div>
   <div class="spacer"></div>
   <a class="checkoutbtn" href="checkout.html">Checkout →</a>
   <button class="cartbtn" id="cartbtn" onclick="toggleCart(true)">Cart (<span id="ccount">0</span>)</button>
@@ -206,58 +208,21 @@ function renderProducts(list) {
   document.getElementById("prows").innerHTML = html || '<tr><td colspan="5" class="spec">No products.</td></tr>';
 }
 
-/* Minimal line-drawn product thumbnails, McMaster-catalog style.
-   Deliberately schematic: they read as "product photo slot" without
-   pretending to be photographs of the actual hardware. */
+/* Grayscale catalog-style product thumbnails (Madrid's artwork, thumbs/). */
 function thumb(id) {
-  var s = 'fill="none" stroke="#111" stroke-width="2"';
-  var f = 'fill="#111"';
-  var open = '<svg viewBox="0 0 48 48" aria-hidden="true">';
   var pic = {
-    rtx4090:
-      '<rect x="8" y="14" width="34" height="20" rx="2" ' + s + '/>' +
-      '<circle cx="19" cy="24" r="6" ' + s + '/>' +
-      '<circle cx="19" cy="24" r="1.6" ' + f + '/>' +
-      '<circle cx="33" cy="24" r="6" ' + s + '/>' +
-      '<circle cx="33" cy="24" r="1.6" ' + f + '/>' +
-      '<rect x="4" y="18" width="4" height="12" ' + f + '/>',
-    teslap40:
-      '<rect x="8" y="14" width="34" height="20" rx="2" ' + s + '/>' +
-      '<line x1="16" y1="14" x2="16" y2="34" ' + s + '/>' +
-      '<line x1="22" y1="14" x2="22" y2="34" ' + s + '/>' +
-      '<line x1="28" y1="14" x2="28" y2="34" ' + s + '/>' +
-      '<line x1="34" y1="14" x2="34" y2="34" ' + s + '/>' +
-      '<rect x="4" y="18" width="4" height="12" ' + f + '/>',
-    rpi5:
-      '<rect x="10" y="10" width="28" height="28" rx="2" ' + s + '/>' +
-      '<rect x="19" y="19" width="10" height="10" ' + s + '/>' +
-      '<circle cx="14" cy="32" r="1.6" ' + f + '/>' +
-      '<circle cx="34" cy="32" r="1.6" ' + f + '/>' +
-      '<line x1="16" y1="10" x2="16" y2="6" ' + s + '/>' +
-      '<line x1="22" y1="10" x2="22" y2="6" ' + s + '/>' +
-      '<line x1="28" y1="10" x2="28" y2="6" ' + s + '/>' +
-      '<line x1="34" y1="10" x2="34" y2="6" ' + s + '/>',
-    nvme4tb:
-      '<rect x="4" y="19" width="36" height="10" rx="1" ' + s + '/>' +
-      '<rect x="9" y="22" width="7" height="4" ' + f + '/>' +
-      '<rect x="20" y="22" width="7" height="4" ' + f + '/>' +
-      '<rect x="36" y="19" width="4" height="10" ' + f + '/>',
-    ddr5kit:
-      '<rect x="4" y="16" width="40" height="14" rx="1" ' + s + '/>' +
-      '<rect x="9" y="20" width="6" height="6" ' + f + '/>' +
-      '<rect x="19" y="20" width="6" height="6" ' + f + '/>' +
-      '<rect x="29" y="20" width="6" height="6" ' + f + '/>' +
-      '<line x1="4" y1="30" x2="44" y2="30" ' + s + '/>',
-    psu1600:
-      '<rect x="8" y="12" width="32" height="24" rx="2" ' + s + '/>' +
-      '<circle cx="24" cy="24" r="8" ' + s + '/>' +
-      '<circle cx="24" cy="24" r="2" ' + f + '/>' +
-      '<line x1="24" y1="16" x2="24" y2="20" ' + s + '/>' +
-      '<line x1="24" y1="28" x2="24" y2="32" ' + s + '/>' +
-      '<line x1="16" y1="24" x2="20" y2="24" ' + s + '/>' +
-      '<line x1="28" y1="24" x2="32" y2="24" ' + s + '/>'
+    rtx4090:   "thumbs/rtx-4090-24gb.webp",
+    teslap40:  "thumbs/tesla-p40-24gb.webp",
+    rpi5:      "thumbs/raspberry-pi-5-8gb.webp",
+    nvme4tb:   "thumbs/4tb-nvme-gen4-ssd.webp",
+    ddr5kit:   "thumbs/128gb-ddr5-ecc-kit.webp",
+    psu1600:   "thumbs/1600w-titanium-psu.webp"
   };
-  return open + (pic[id] || '') + '</svg>';
+  var name = id;
+  for (var i = 0; i < PRODUCTS.length; i++) {
+    if (PRODUCTS[i].id === id) { name = PRODUCTS[i].name; break; }
+  }
+  return '<img src="' + (pic[id] || "") + '" alt="' + esc(name) + '" loading="lazy">';
 }
 
 function esc(s) {

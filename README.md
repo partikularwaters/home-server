@@ -4,7 +4,7 @@ A tiny demo store for a web security class. It teaches one lesson: **the
 browser is the user's computer, so anything enforced only in the browser is
 not enforced at all.**
 
-Live demo: `https://home-server.vercel.app` (checkout page has the demo controls)
+Live demo: `https://homeserverstore.vercel.app/` (checkout page has the demo controls)
 
 ## The lesson in 30 seconds
 
