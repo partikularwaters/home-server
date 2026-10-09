@@ -3,130 +3,127 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hidden Is Not Protected — Team 2</title>
+<title>Hidden Is Not Protected — HomeServer · Team 2</title>
 <link rel="icon" href="favicon.ico" type="image/x-icon">
 <style>
-  :root { --ink:#111; --mut:#555; --line:#ddd; --blue:#0066c0; }
-  * { box-sizing:border-box; }
-  html, body { height:100%; }
-  body {
-    margin:0; background:#fff; color:var(--ink);
-    font:18px/1.5 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
-    height:100dvh; overflow:hidden;
-  }
-  .slide { display:none; height:100dvh; padding:56px 72px; max-width:1100px; margin:0 auto;
-           flex-direction:column; justify-content:center; }
-  .slide.on { display:flex; }
-  .kicker { font-size:13px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
-            color:var(--mut); margin-bottom:14px; }
-  h1 { font-size:52px; letter-spacing:-.02em; margin:0 0 10px; line-height:1.1; }
-  h2 { font-size:36px; letter-spacing:-.01em; margin:0 0 16px; }
-  p.big { font-size:22px; max-width:820px; }
-  .cols { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:8px; }
-  .card { border:2px solid var(--ink); border-radius:8px; padding:18px 22px; }
-  .card h3 { margin:0 0 6px; font-size:20px; }
-  .card p { margin:0; color:var(--mut); font-size:16px; }
-  ul.tight { font-size:20px; max-width:860px; }
-  ul.tight li { margin-bottom:10px; }
-  code { background:#f2f2f2; padding:2px 8px; border-radius:5px; font-size:.9em; }
-  .rule { font-size:44px; font-weight:800; letter-spacing:-.02em; }
-  .src { font-size:14px; color:var(--mut); margin-top:22px; max-width:860px; }
-  .who { position:fixed; bottom:18px; left:72px; font-size:12px; color:var(--mut);
-         letter-spacing:.06em; text-transform:uppercase; }
-  .num { position:fixed; bottom:18px; right:72px; font-size:12px; color:var(--mut); }
-  .bias { font-size:14px; color:var(--mut); border-left:3px solid var(--blue);
-          padding-left:12px; margin-top:14px; max-width:860px; }
-  @media (max-width:700px) { .slide { padding:32px; } h1 { font-size:36px; } .cols { grid-template-columns:1fr; } }
+:root{--ink:#111;--mut:#555;--line:#ddd;--blue:#0066c0;--zebra:#f7f7f7;--ok:#0a7a2f;--bad:#b00020;--server:#0d1117}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:#fff;color:var(--ink);font:18px/1.45 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;display:flex;flex-direction:column;height:100dvh;overflow:hidden}
+a{color:var(--blue)}button,a,input{touch-action:manipulation}button{font:inherit;cursor:pointer}button:focus-visible,a:focus-visible{outline:3px solid var(--blue);outline-offset:4px}button:disabled{opacity:.35;cursor:default}
+.top{display:flex;align-items:center;gap:16px;padding:12px 28px;border-bottom:2px solid var(--ink);min-height:62px;flex:none}.logo{font-weight:800;font-size:21px;letter-spacing:-.02em;color:var(--ink);text-decoration:none}.logo img{width:22px;height:22px;vertical-align:-3px;margin-right:8px;image-rendering:pixelated}.tag{color:var(--mut);font-size:13px}.top .tag{margin-left:auto}
+main{flex:1;min-height:0;overflow:auto}.slide{display:none;max-width:1280px;min-height:100%;margin:auto;padding:clamp(24px,4vh,48px) 48px;flex-direction:column;justify-content:center;gap:22px}.slide.on{display:flex}.eyebrow{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--mut);font-weight:700;margin:0 0 10px}h1,h2,h3,p{margin:0}h1{font-size:clamp(42px,4.8vw,70px);line-height:1.06;letter-spacing:-.045em}h2{font-size:clamp(34px,3.5vw,50px);line-height:1.12;letter-spacing:-.035em}h3{font-size:26px;line-height:1.2;letter-spacing:-.02em}.lead{font-size:clamp(21px,2vw,28px);color:var(--mut);line-height:1.35;margin-top:14px}.split{display:grid;grid-template-columns:1fr 1fr;gap:42px;align-items:center}.title-split{grid-template-columns:1.1fr .9fr;gap:50px}.blue{color:var(--blue)}.caption{font-size:14px;color:var(--mut);line-height:1.4}.takeaway{border-top:2px solid var(--ink);padding-top:18px;font-size:26px;font-weight:700;letter-spacing:-.015em}.pill{display:inline-block;font-size:13px;font-weight:700;background:var(--zebra);padding:5px 10px;border:1px solid var(--line);border-radius:5px}.btn{display:inline-block;border:2px solid var(--ink);border-radius:6px;padding:9px 16px;background:var(--ink);color:#fff;text-decoration:none;font-weight:700;line-height:1.2}.btn:hover{background:#fff;color:var(--ink)}.btn.bluebtn{background:var(--blue);border-color:var(--blue);color:#fff}.btn.bluebtn:hover{background:#004e92;border-color:#004e92}
+/* Reuse the store's table, checkout form, demo stripe and server-view vocabulary. */
+.window{border:2px solid var(--ink);border-radius:8px;overflow:hidden;background:#fff}.window-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-bottom:2px solid var(--ink);font-size:18px;font-weight:800}.window-head small{font-size:12px;font-weight:500;color:var(--mut)}.window-body{padding:20px}.stripe{padding:8px 18px;background:repeating-linear-gradient(-45deg,#ffe08a,#ffe08a 14px,#ffd063 14px,#ffd063 28px);border-bottom:2px solid var(--ink);font-size:12px;font-weight:800;letter-spacing:.07em;text-transform:uppercase}.product{display:flex;align-items:center;gap:18px;padding:12px 0 20px;border-bottom:1px solid var(--line)}.product img{width:88px;height:88px;object-fit:contain}.product strong{font-size:21px}.product small{display:block;color:var(--mut);font-size:14px;margin-top:3px}.bill{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:17px 0;font-weight:800;font-size:23px;font-variant-numeric:tabular-nums}.mock-btn{display:block;text-align:center;background:var(--ink);color:white;border-radius:6px;padding:12px;font-size:17px;font-weight:700}.price-question{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:24px}.price-question span{font-size:15px;color:var(--mut)}.price-question strong{font-size:52px;line-height:1;letter-spacing:-.035em;color:var(--blue)}.price-question .arrow{font-size:28px;color:var(--mut)}.byline{font-size:16px;color:var(--mut);margin-top:28px}
+.record-title{display:flex;align-items:center;gap:12px;margin-bottom:16px}.record-title .number{font-size:15px;font-weight:800;border:2px solid var(--ink);border-radius:50%;height:32px;width:32px;display:grid;place-items:center}.record-title p{color:var(--mut);font-size:18px;margin-top:4px}.store-table{width:100%;border-collapse:collapse;font-size:19px}.store-table th{text-align:left;text-transform:uppercase;letter-spacing:.05em;font-size:12px;color:var(--mut);padding:8px 10px;border-bottom:2px solid var(--ink)}.store-table td{padding:17px 10px;border-bottom:1px solid var(--line)}.store-table tbody tr:nth-child(even){background:var(--zebra)}.store-table td:last-child{text-align:right;font-weight:700;white-space:nowrap}.store-table tr.selected{color:var(--blue)}.selection{padding:16px 0;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px}.selection img{width:64px;height:64px;object-fit:contain}.selection strong{display:block;font-size:21px}.selection span{color:var(--mut);font-size:16px}.record-note{margin-top:20px;font-size:21px;font-weight:700}.secure-note{font-size:17px;color:var(--mut)}
+.checkout-grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:stretch}.field{border:1px solid var(--ink);border-radius:5px;padding:9px 12px;font-size:17px;margin:5px 0 12px}.field-label{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut)}.mini-product{display:flex;align-items:center;gap:10px;font-size:15px;padding:10px 0;border-bottom:1px solid var(--line)}.mini-product img{width:42px;height:42px;object-fit:contain}.mini-product span:last-child{margin-left:auto;font-weight:700}.checkout-total{font-size:19px;border-top:2px solid var(--ink);padding:10px 0}.server{background:var(--server);color:#c9d1d9;border:2px solid var(--ink);border-radius:8px;overflow:hidden;display:flex;flex-direction:column}.server-head{border-bottom:1px solid #30363d;padding:14px 20px;color:#8b949e;font-size:14px}.server-body{padding:24px;display:flex;flex-direction:column;justify-content:center;gap:18px;flex:1}.server-body h3{color:#fff;font-size:27px}.server-body p{font-size:17px;color:#c9d1d9}.hidden-value{display:flex;align-items:center;justify-content:space-between;gap:16px;border:1px solid #30363d;padding:17px;border-radius:5px;font-size:18px}.hidden-value output{font:700 36px/1 ui-monospace,SFMono-Regular,Consolas,monospace;color:#3fb950}.server .btn{align-self:flex-start}.server .caption{color:#8b949e}.server.changed output{color:#f85149}.explanation{color:#c9d1d9;min-height:50px}
+.story{display:grid;grid-template-columns:1fr 64px 1fr;align-items:center;gap:14px}.story-arrow{text-align:center;font-size:44px;color:var(--blue)}.story-card{border:2px solid var(--ink);border-radius:8px;overflow:hidden;align-self:stretch}.story-title{border-bottom:2px solid var(--ink);padding:14px 20px;font-size:17px;font-weight:800;background:var(--zebra)}.story-body{padding:24px;display:flex;flex-direction:column;gap:18px}.key{width:64px;height:64px;color:var(--blue)}.key-row{display:flex;align-items:center;gap:16px}.key-row strong{font-size:23px}.key-row small{display:block;color:var(--mut);font-size:16px;margin-top:5px}.request{border:1px solid var(--line);border-radius:5px;padding:16px;background:var(--zebra);font-size:21px}.access{padding:15px 0;border-bottom:1px solid var(--line);font-size:23px;font-weight:700}.access span{display:block;font-size:17px;color:var(--mut);font-weight:400;margin-top:5px}.story-warning{color:var(--bad);font-size:18px;font-weight:700}.story-caption{display:flex;justify-content:space-between;gap:20px;font-size:13px;color:var(--mut)}
+.live{padding:28px;border:2px solid var(--ink);border-radius:8px}.live .stripe{margin:-28px -28px 28px;border-radius:6px 6px 0 0}.modes{display:grid;grid-template-columns:1fr 1fr;gap:0;margin:26px 0}.mode{padding:5px 26px 5px 0}.mode+ .mode{padding-left:26px;border-left:1px solid var(--line)}.mode h3{margin-bottom:8px}.mode p{font-size:23px;color:var(--mut)}.live-actions{display:flex;align-items:center;gap:20px}.live-actions a:last-child{font-size:16px}.demo-question{font-size:32px;font-weight:700;letter-spacing:-.02em}
+.close-grid{display:grid;grid-template-columns:1.15fr 1fr;gap:40px}.close-block h3{margin-bottom:20px}.payment-flow{display:flex;align-items:center;gap:16px;padding:22px 0;border-top:2px solid var(--ink);border-bottom:1px solid var(--line);font-size:24px;font-weight:700}.payment-flow .arrow{font-size:26px;color:var(--blue)}.service-names{display:flex;gap:8px;margin-bottom:16px}.close-block p{font-size:18px;color:var(--mut);margin-top:16px}.rules{border-top:2px solid var(--ink)}.rule-row{padding:17px 0;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:20px;font-size:21px}.rule-row span{color:var(--blue);font-weight:700}.closing{display:flex;align-items:baseline;justify-content:space-between;gap:20px;border-top:2px solid var(--ink);padding-top:20px}.closing strong{font-size:36px;letter-spacing:-.03em}.closing span{font-size:21px;color:var(--mut)}.sources{font-size:12px;color:var(--mut);line-height:1.6}
+.bot{display:flex;align-items:center;gap:20px;border-top:1px solid var(--line);padding:10px 28px;flex:none;background:#fff;font-size:12px;color:var(--mut)}.progress{display:flex;gap:7px;margin-left:auto}.progress a{display:block;width:25px;height:5px;background:var(--line);border-radius:1px}.progress a[aria-current="step"]{background:var(--blue)}.controls{display:flex;align-items:center;gap:9px}.controls button{background:#fff;border:2px solid var(--ink);border-radius:5px;color:var(--ink);width:34px;height:30px;font-weight:700;font-size:17px}.controls button:hover:not(:disabled){background:var(--ink);color:#fff}.counter{min-width:40px;text-align:center;font-variant-numeric:tabular-nums}.keyboard{font-size:11px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+@media(min-width:900px) and (max-height:820px){.slide{padding:22px 44px;gap:18px}h1{font-size:55px}h2{font-size:40px}.lead{font-size:23px}.server-body{padding:18px;gap:14px}.window-body{padding:16px}.field{margin-bottom:8px}.story-body{padding:20px;gap:12px}.closing strong{font-size:30px}.top{min-height:54px;padding:9px 28px}}
+@media(max-width:850px){.hidden-value{flex-direction:column;align-items:flex-start;gap:12px}.store-table{font-size:16px}.store-table td{padding:14px 8px}.slide{padding:28px 24px;gap:24px;justify-content:flex-start}.split,.title-split,.checkout-grid,.close-grid{grid-template-columns:1fr;gap:24px}.top{padding:12px 18px}.top .tag{font-size:11px}.top .tag span{display:none}.bot{padding:10px 16px;gap:12px}.keyboard{display:none}.progress{display:none}h1{font-size:44px}h2{font-size:35px}.story{grid-template-columns:1fr;gap:12px}.story-arrow{transform:rotate(90deg);font-size:30px;line-height:1}.story-caption{flex-direction:column;gap:5px}.modes{grid-template-columns:1fr;gap:20px}.mode,.mode+.mode{padding:0;border:0}.closing{align-items:flex-start;flex-direction:column;gap:10px}.closing strong{font-size:30px}.payment-flow{font-size:21px}.live-actions{align-items:flex-start;flex-direction:column}.live{padding:20px}.live .stripe{margin:-20px -20px 20px}.byline{margin-top:18px}}
+@media print{body{display:block;height:auto;overflow:visible}.top,.bot{display:none}main{overflow:visible}.slide,.slide.on{display:flex;min-height:0;height:180mm;padding:15mm;break-after:page;page-break-after:always}.slide:last-child{break-after:auto}.btn{print-color-adjust:exact}.stripe,.server{print-color-adjust:exact;-webkit-print-color-adjust:exact}.split,.title-split,.checkout-grid,.close-grid{grid-template-columns:1fr 1fr}.story{grid-template-columns:1fr 40px 1fr}.story-arrow{transform:none}.slide{justify-content:center}h1{font-size:45px}h2{font-size:34px}.keyboard{display:none}}
 </style>
 </head>
 <body>
-
-<!-- 1. Title -->
-<section class="slide on" data-who="Eric">
-  <div class="kicker">Mayerfeld AI Operations practicum · Team 2</div>
-  <h1>Hidden Is Not Protected</h1>
-  <p class="big">Why you can't trust anything that comes from the browser.</p>
-  <p class="big" style="color:var(--mut)">Eric Acosta · John Madrid</p>
+<header class="top"><a class="logo" href="index.html"><img src="favicon.ico" alt="">HomeServer</a><div class="tag">Team 2 <span>· Mayerfeld AI Operations practicum</span></div></header>
+<main aria-label="Presentation slides">
+<section class="slide on" id="slide-1" data-who="Eric" aria-labelledby="title-1">
+<div class="split title-split">
+<div><p class="eyebrow">A web security lesson</p><h1 id="title-1">Why can’t you trust the browser?</h1><p class="lead">What stops a shopper from changing the price?</p><p class="byline">Eric Acosta · John Madrid</p></div>
+<div><div class="window"><div class="window-head">HomeServer <small>Cart (1)</small></div><div class="window-body"><div class="product"><img src="thumbs/rtx-4090-24gb.webp" alt="RTX 4090 graphics card"><div><strong>RTX 4090 24GB</strong><small>One graphics card. One shopper.</small></div></div><div class="bill"><span>Total</span><span>$1,599.00</span></div><div class="mock-btn">Checkout →</div></div></div><div class="price-question"><span>A different claim?</span><span class="arrow" aria-hidden="true">→</span><strong>$1.00</strong></div><p class="caption" style="margin-top:16px">Illustrative HomeServer cart · no real purchase.</p></div>
+</div>
 </section>
-
-<!-- 2. The two computers -->
-<section class="slide" data-who="Eric">
-  <div class="kicker">The model</div>
-  <h2>Two computers</h2>
-  <div class="cols">
-    <div class="card"><h3>Theirs</h3><p>The browser. The user's machine. They can read and change everything in it.</p></div>
-    <div class="card"><h3>Ours</h3><p>The server. Our machine. The only place a rule can actually be enforced.</p></div>
-  </div>
-  <p class="big" style="margin-top:22px">The browser sends <b>claims</b>. The server decides <b>what's true</b>.</p>
+<section class="slide" id="slide-2" data-who="Eric" aria-labelledby="title-2">
+<div><h2 id="title-2">Your screen and the store’s records</h2><p class="lead">The shopper chooses the item. The store determines the price.</p></div>
+<div class="split">
+<div><div class="record-title"><span class="number">1</span><div><h3>Your device</h3><p>“This is what I want to buy.”</p></div></div><div class="window"><div class="window-head">HomeServer <small>Your cart</small></div><div class="window-body"><div class="selection"><img src="thumbs/rtx-4090-24gb.webp" alt=""><div><strong>RTX 4090 24GB</strong><span>Quantity: 1</span></div></div><p class="record-note">Sends the item and quantity →</p></div></div></div>
+<div><div class="record-title"><span class="number">2</span><div><h3>The store’s system</h3><p>“Here is what that item costs.”</p></div></div><table class="store-table" aria-label="Illustrative store price records"><thead><tr><th>Product</th><th style="text-align:right">Price</th></tr></thead><tbody><tr class="selected"><td>RTX 4090 24GB</td><td>$1,599.00</td></tr><tr><td>Raspberry Pi 5 8GB</td><td>$80.00</td></tr><tr><td>4TB NVMe Gen4 SSD</td><td>$299.00</td></tr></tbody></table><p class="record-note">Calculates the bill from its own records.</p></div>
+</div>
+<p class="secure-note">A secure connection protects the message in transit. It doesn’t prove the price inside is right.</p>
+<p class="caption">Illustrative HomeServer cart and price records.</p>
 </section>
-
-<!-- 3. What's in the browser -->
-<section class="slide" data-who="Eric">
-  <div class="kicker">What the user controls</div>
-  <h2>Everything in the browser is editable</h2>
-  <ul class="tight">
-    <li><code>HTML</code> — view source, change any text, price, or label.</li>
-    <li><code>CSS</code> — un-hide anything marked "hidden".</li>
-    <li><code>JavaScript</code> — pause it, rewrite it, skip it.</li>
-    <li><code>DevTools</code> — edit a form field, replay a request with new values.</li>
-  </ul>
-  <p class="big" style="color:var(--mut)">"Hidden" in the browser means "one right-click away".</p>
+<section class="slide" id="slide-3" data-who="Eric" aria-labelledby="title-3">
+<div><h2 id="title-3">Hidden is not protected</h2><p class="lead">Out of sight does not mean out of reach.</p></div>
+<div class="checkout-grid">
+<div class="window"><div class="window-head">HomeServer <small>Checkout</small></div><div class="stripe">Demo mode · slide recreation</div><div class="window-body"><div class="field-label">Name</div><div class="field">Ada Lovelace</div><div class="field-label">Email</div><div class="field">ada@example.com</div><div class="mini-product"><img src="thumbs/rtx-4090-24gb.webp" alt=""><span>RTX 4090 24GB × 1</span><span>$1,599.00</span></div><div class="bill checkout-total"><span>Total</span><span>$1,599.00</span></div><div class="mock-btn">Place order — $1,599.00</div></div></div>
+<div class="server" id="hidden-panel"><div class="server-head">Behind the page · simplified inspection</div><div class="server-body"><h3>The hidden total is still on your device.</h3><div class="hidden-value"><span>Submitted total</span><output id="hidden-total" aria-live="polite">$1,599.00</output></div><button type="button" class="btn bluebtn" id="change-total">Change hidden total to $1.00</button><p class="explanation" id="hidden-explanation" aria-live="polite">A shopper can change this value before sending it.</p><p class="caption">Illustration only. This button doesn’t submit an order.</p></div></div>
+</div><p class="takeaway">The store must check the price itself.</p>
 </section>
-
-<!-- 4. Case file -->
-<section class="slide" data-who="Eric">
-  <div class="kicker">Case file</div>
-  <h2>A real checkout hack</h2>
-  <ul class="tight">
-    <li>September 2026: a bug-bounty researcher intercepted a checkout request, changed the <code>amount</code> field, and the server accepted it — without ever re-checking the invoice.</li>
-    <li>The price check lived only in the browser. The server trusted the claim.</li>
-    <li>OWASP lists exactly this under Web Security Testing Guide: <i>Test Payment Functionality</i> — tamper hidden fields, replay modified requests.</li>
-  </ul>
-  <div class="bias">Bias note: the writeup comes from a bounty hunter, who is paid to find and dramatize impact; the target's name is redacted for responsible disclosure. OWASP is a vendor-neutral community standard — drier, and the stronger citation.</div>
+<section class="slide" id="slide-4" data-who="Eric" aria-labelledby="title-4">
+<div><p class="eyebrow">GitHub · March 2012</p><h2 id="title-4">An outsider got access to change project files.</h2><p class="lead">The website accepted a change it should have refused.</p></div>
+<div class="story">
+<div class="story-card"><div class="story-title">An outsider’s account</div><div class="story-body"><div class="key-row"><svg class="key" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="4" aria-hidden="true"><circle cx="20" cy="22" r="12"/><path d="M29 31l23 23m-10-10l6-6m-14-2l6-6"/></svg><div><strong>A digital key</strong><small>Identifies who can connect.</small></div></div><div class="request">Adds their own public key.</div><p class="caption">Through an account-settings change.</p></div></div>
+<div class="story-arrow" aria-hidden="true">→</div>
+<div class="story-card"><div class="story-title">Rails organization on GitHub</div><div class="story-body"><div class="access">Key attached to the organization<span>It belonged to the outsider.</span></div><div class="access">Access to change project files<span>A new file was pushed.</span></div><p class="story-warning">This permission should not have been granted.</p></div></div>
+</div><div class="story-caption"><span>Simplified illustration · not the historical interface.</span><a href="https://github.blog/news-insights/the-library/public-key-security-vulnerability-and-mitigation/" target="_blank" rel="noopener noreferrer">Source: GitHub’s incident report ↗</a></div><p class="caption">Cause: mass assignment — the form’s fields were not restricted to what the caller was allowed to change.</p><p class="takeaway">The system must check who is allowed to make the change.</p>
 </section>
-
-<!-- 5. The demo -->
-<section class="slide" data-who="Madrid">
-  <div class="kicker">Live demo</div>
-  <h2>HomeServer</h2>
-  <p class="big">A small parts store. Checkout has one control the customers never see: a <b>Hidden / Protected</b> toggle.</p>
-  <ul class="tight">
-    <li><b>Hidden:</b> the order goes to a table that trusts the browser's total.</li>
-    <li><b>Protected:</b> the order goes to a table where the database re-checks the price before writing anything.</li>
-  </ul>
-  <p class="big" style="color:var(--mut)">We'll change the total in DevTools, submit, and then ask the server what it actually stored.</p>
+<section class="slide" id="slide-5" data-who="Madrid" aria-labelledby="title-5">
+<div><p class="eyebrow">Live demo · HomeServer</p><h2 id="title-5">Claim versus calculation</h2><p class="lead">Same item. Same edited total. Two different checks.</p></div>
+<div class="live"><div class="stripe">Simulated checkout · no real payment</div><p class="demo-question">What will the store actually save?</p><div class="modes"><div class="mode"><h3>Hidden</h3><p>Accepts the total sent by the browser.</p></div><div class="mode"><h3 class="blue">Protected</h3><p>Calculates the total from the store’s prices.</p></div></div><div class="live-actions"><a class="btn" href="checkout.html" target="_blank" rel="noopener">Open HomeServer checkout →</a><a href="index.html" target="_blank" rel="noopener">Open storefront ↗</a></div></div><p class="caption">Presenter cue: change the hidden total, submit in each mode, compare the stored orders.</p>
 </section>
-
-<!-- 6. The rule -->
-<section class="slide" data-who="Madrid">
-  <div class="kicker">The takeaway</div>
-  <p class="rule">Hidden is not protected.</p>
-  <p class="big">For any feature, price, or permission, ask two questions:</p>
-  <ul class="tight">
-    <li>Does the <b>browser</b> enforce it? → cosmetic.</li>
-    <li>Does the <b>server</b> re-check it? → real.</li>
-  </ul>
-  <div class="src">Sources: OWASP Web Security Testing Guide (Test Payment Functionality); Sept 2026 bug-bounty checkout writeup (target redacted); HomeServer demo code and schema are in the repo — fork it, use your own keys.</div>
+<section class="slide" id="slide-6" data-who="Madrid" aria-labelledby="title-6">
+<div><h2 id="title-6">The protection is the check.</h2><p class="lead">Established checkout tools help. The website still has rules to enforce.</p></div>
+<div class="close-grid"><div class="close-block"><h3>Payment: check beyond the browser</h3><div class="service-names"><span class="pill">Stripe</span><span class="pill">PayPal</span></div><div class="payment-flow"><span>Store sets<br>the bill</span><span class="arrow" aria-hidden="true">→</span><span>Payment service<br>confirms payment</span></div><p>With a correct integration, changing a number on your screen doesn’t change the authorized bill.</p><p>The store still needs to get prices, discounts and quantities right.</p></div><div class="close-block"><h3>Other rules: check on the server</h3><div class="rules"><div class="rule-row"><strong>Private orders</strong><span>Is this yours?</span></div><div class="rule-row"><strong>One-time offers</strong><span>Already used?</span></div><div class="rule-row"><strong>Project access</strong><span>Are you allowed?</span></div></div><p>A safe payment tool doesn’t make these decisions for the whole website.</p></div></div>
+<div class="closing"><strong>Hidden is not protected.</strong><span>Questions?</span></div>
+<p class="sources">Sources: <a href="https://docs.stripe.com/api/checkout/sessions/create" target="_blank" rel="noopener noreferrer">Stripe Checkout</a> · <a href="https://docs.stripe.com/checkout/fulfillment" target="_blank" rel="noopener noreferrer">Stripe payment confirmation</a> · <a href="https://developer.paypal.com/platforms/checkout/standard/integrate" target="_blank" rel="noopener noreferrer">PayPal integration</a> · <a href="https://cheatsheetseries.owasp.org/cheatsheets/Third_Party_Payment_Gateway_Integration_Cheat_Sheet.html" target="_blank" rel="noopener noreferrer">OWASP payment guidance</a></p>
 </section>
-
-<div class="who" id="who"></div>
-<div class="num" id="num"></div>
-
+</main>
+<footer class="bot"><span id="presenter">Presenter: Eric</span><span class="keyboard">← → / Space to navigate · F for fullscreen</span><nav class="progress" aria-label="Choose slide"></nav><div class="controls"><button id="prev" aria-label="Previous slide">←</button><span class="counter" id="counter" aria-live="polite">1 / 6</span><button id="next" aria-label="Next slide">→</button></div></footer>
 <script>
-var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
-var i = 0;
-function show(n) {
-  i = Math.max(0, Math.min(slides.length - 1, n));
-  slides.forEach(function (s, k) { s.classList.toggle("on", k === i); });
-  document.getElementById("who").textContent = "Presenter: " + slides[i].dataset.who;
-  document.getElementById("num").textContent = (i + 1) + " / " + slides.length;
-}
-document.addEventListener("keydown", function (e) {
-  if (e.key === "ArrowRight" || e.key === " ") show(i + 1);
-  if (e.key === "ArrowLeft") show(i - 1);
+// Static teaching illustrations only: no backend, payment calls, or cart changes.
+const slides = Array.from(document.querySelectorAll('.slide'));
+const progress = document.querySelector('.progress');
+let current = 0;
+slides.forEach((slide, n) => {
+  const link = document.createElement('a');
+  link.href = '#slide-' + (n + 1);
+  link.setAttribute('aria-label', 'Slide ' + (n + 1) + ': ' + slide.querySelector('h1,h2').textContent);
+  progress.append(link);
 });
-document.addEventListener("click", function () { show(i + 1); });
-show(0);
+function show(n, updateHash = true) {
+  current = Math.max(0, Math.min(slides.length - 1, n));
+  slides.forEach((slide, k) => { slide.classList.toggle('on', k === current); slide.inert = k !== current; });
+  Array.from(progress.children).forEach((link, k) => { if (k === current) link.setAttribute('aria-current', 'step'); else link.removeAttribute('aria-current'); });
+  document.getElementById('presenter').textContent = 'Presenter: ' + slides[current].dataset.who;
+  document.getElementById('counter').textContent = (current + 1) + ' / ' + slides.length;
+  document.getElementById('prev').disabled = current === 0;
+  document.getElementById('next').disabled = current === slides.length - 1;
+  document.querySelector('main').scrollTop = 0;
+  if (updateHash) history.replaceState(null, '', '#slide-' + (current + 1));
+}
+function fromHash() {
+  const match = location.hash.match(/^#slide-([1-6])$/);
+  show(match ? Number(match[1]) - 1 : 0, false);
+}
+window.addEventListener('hashchange', fromHash);
+document.getElementById('prev').addEventListener('click', () => show(current - 1));
+document.getElementById('next').addEventListener('click', () => show(current + 1));
+document.addEventListener('keydown', async (event) => {
+  if (event.target.closest('input,textarea,select,[contenteditable="true"]') || event.altKey || event.ctrlKey || event.metaKey) return;
+  if ((event.key === ' ' || event.key === 'Enter') && event.target.closest('button,a')) return;
+  if (['ArrowRight', 'PageDown', ' ', 'ArrowLeft', 'PageUp', 'Home', 'End'].includes(event.key)) event.preventDefault();
+  if (['ArrowRight', 'PageDown', ' '].includes(event.key)) show(current + 1);
+  if (['ArrowLeft', 'PageUp'].includes(event.key)) show(current - 1);
+  if (event.key === 'Home') show(0);
+  if (event.key === 'End') show(slides.length - 1);
+  if (event.key.toLowerCase() === 'f') {
+    try { if (document.fullscreenElement) await document.exitFullscreen(); else await document.documentElement.requestFullscreen(); } catch (_) { /* Browser may decline fullscreen; navigation still works. */ }
+  }
+});
+// Keep click-to-advance on blank slide space; illustrations and controls never advance.
+document.querySelector('main').addEventListener('click', (event) => {
+  if (event.target.closest('button,a,.window,.server,.story,.store-table,.live')) return;
+  show(current + 1);
+});
+let changed = false;
+document.getElementById('change-total').addEventListener('click', () => {
+  changed = !changed;
+  document.getElementById('hidden-panel').classList.toggle('changed', changed);
+  document.getElementById('hidden-total').textContent = changed ? '$1.00' : '$1,599.00';
+  document.getElementById('hidden-explanation').textContent = changed ? 'The visible bill is unchanged. The submitted value is now different.' : 'A shopper can change this value before sending it.';
+  document.getElementById('change-total').textContent = changed ? 'Reset hidden total' : 'Change hidden total to $1.00';
+});
+fromHash();
 </script>
 </body>
 </html>

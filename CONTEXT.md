@@ -13,6 +13,8 @@ Hidden/Protected toggle, built to demo why you can't trust the browser.
 | `build-config.js` | Build step: writes `public/config.js` from Vercel env vars |
 | `config.example.js` | Setup template for forkers (real keys stay out of git) |
 | `DEMO-SCRIPT.md` | Talk runbook for the live demo |
+| `research/` | Public source-backed research companion (GitHub only; not deployed) |
+| `docs/` | Local presenter preparation (gitignored; not deployed) |
 
 Factory (stable): `assets/`, `schema.sql`, `config.example.js`.
 Product (the deploy): `public/`, live at https://homeserverstore.vercel.app/

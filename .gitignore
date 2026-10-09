@@ -5,3 +5,6 @@ config.js
 # OS noise
 .DS_Store
 Thumbs.db
+
+# Internal presenter preparation; public summaries live in research/.
+/docs/
