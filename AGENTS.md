@@ -11,7 +11,9 @@ Static site (Vercel) + Supabase backend. Not a real store.
   holds the deployed copies.
 - `schema.sql` — Supabase tables. `config.example.js` — setup template
   (real keys live in gitignored `public/config.js` or Vercel env vars).
-- `DEMO-SCRIPT.md` — the talk runbook. `README.md` — human setup guide.
+- `docs/DEMO-SCRIPT.md` — the talk runbook (internal). `README.md` — human setup guide.
+- `docs/` — the talk's knowledge base (theory, examples, demo internals).
+  Reference for presenters; not deployed.
 
 ## Task routing
 
@@ -19,7 +21,7 @@ Static site (Vercel) + Supabase backend. Not a real store.
   parity after edits.
 - Change product art → edit `assets/`, then copy the web-ready files
   into `public/thumbs/`.
-- Change the demo flow → `checkout.html` + `DEMO-SCRIPT.md` together.
+- Change the demo flow → `checkout.html` + `docs/DEMO-SCRIPT.md` together.
 - Deploy → push to main; Vercel builds (`node build-config.js`) and
   deploys automatically.
 

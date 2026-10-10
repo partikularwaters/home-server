@@ -57,7 +57,7 @@ trigger is bypassed. [Source: Supabase API keys](https://supabase.com/docs/guide
 
 ## Running the hack (rehearsal)
 
-Full beats in `DEMO-SCRIPT.md`. The short version:
+The full runbook is internal presenter preparation. The short version:
 
 1. Add an RTX 4090 to the cart, go to checkout. Toggle is on **Hidden**.
 2. DevTools → Elements → find `<input type="hidden" id="order_total">`,
