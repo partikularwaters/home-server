@@ -7,6 +7,10 @@ Static site (Vercel) + Supabase backend. Not a real store.
 
 - `public/` — the deployed site. Vercel serves this directory as root.
   `index.html` (storefront), `checkout.html` (the demo), `slides.html` (talk slides).
+- Back Office: `public/payment.html`, `public/order-success.html`, and
+  `public/admin.html`; shared logic in `public/demo-core.js` and cockpit in
+  `public/backoffice.js`. Live boundary: `api/backoffice.js`, additive database
+  migration: `backoffice.sql`, and Make setup: `make/README.md`.
 - `assets/` — source artwork (factory). Never deployed; `public/thumbs/`
   holds the deployed copies.
 - `schema.sql` — Supabase tables. `config.example.js` — setup template
@@ -28,6 +32,10 @@ Static site (Vercel) + Supabase backend. Not a real store.
 ## Rules
 
 - Never commit `public/config.js` (gitignored; holds the Supabase anon key).
+- Never put Back Office server keys or Make tokens in `public/` or build output.
+- Back Office reset is scoped to its active rehearsal; never delete original
+  `orders`, `orders_vuln`, or `products`. Test with
+  `node --test tests/backoffice.test.js`; preview with `node scripts/serve-demo.js`.
 - `public/` is the deploy root: don't move it, don't reference anything
   outside it from the pages.
 - Keep the `CONTEXT.md` files current when the structure changes.

@@ -1,6 +1,9 @@
 # Local secrets. Never commit these.
 public/config.js
 config.js
+.env
+.env.*
+!.env.backoffice.example
 
 # OS noise
 .DS_Store

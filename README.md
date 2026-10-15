@@ -1,10 +1,59 @@
-# HomeServer — "Hidden Is Not Protected"
+# HomeServer — Back Office and "Hidden Is Not Protected"
 
-A tiny demo store for a web security class. It teaches one lesson: **the
-browser runs on the user's device, so page-only checks cannot enforce the
-store's price or access rules.**
+A tiny demo store for two classroom demonstrations: webhooks versus polling,
+and browser input versus server-side checks. No real payments, invoices sent
+to customers, or goods shipped.
 
-Live demo: `https://homeserverstore.vercel.app/` (checkout page has the demo controls)
+## Back Office: webhooks versus polling
+
+The storefront's **Checkout** opens a mock gateway with separate authorization
+and capture, then a conventional order confirmation. The presenter cockpit
+below the store shows the order lifecycle, one invoice per order, which path
+fulfilled it, and every delivery attempt and scheduled run. **Security demo**
+still opens the original Hidden/Protected checkout.
+
+Run `node scripts/serve-demo.js` and open `http://127.0.0.1:8080/`. Local Sim is
+the default; it needs no credentials or external service. The storefront uses
+the fixed rehearsal catalog in `public/demo-core.js`. The original security
+checkout continues to use Supabase's product catalog and price trigger.
+
+Four beats:
+
+1. Capture payment: the webhook fulfills immediately; the next poll finds zero.
+2. Fire the webhook again: `duplicate_ignored`, with the same invoice.
+3. Pause the regular poller and disable webhook delivery. Capture another
+   payment, wait for the paid-age threshold, then run reconciliation. The order
+   moves from `paid` to `fulfilled_by=reconciliation`.
+4. Arm the stock condition, then run its clock check. One simulated reorder
+   alert appears without a payment webhook.
+
+Local schedules run only while a demo page is open. Defaults: poll every 30
+seconds, reconciliation every 60 seconds for payments at least 10 seconds old,
+and condition checks every 20 seconds. The cockpit exposes these values, job
+toggles, manual runs, mode selection, and reset. Local Sim and Make Live have
+separate rehearsal data. Reset clears only the active rehearsal, preserving
+the cart and original security-demo tables.
+
+**Make Live setup:** see [the four scenario contracts and setup guide](make/README.md),
+[`backoffice.sql`](backoffice.sql), and [server-only environment template](.env.backoffice.example).
+Live services must be configured and rehearsed before presenting. The code and
+request templates do not create Make scenarios or apply the migration for you.
+The cockpit does not enable Make Live until its server configuration is present.
+Make API configuration is additionally required for cockpit Run now buttons;
+otherwise use Run once in Make. Live schedules execute in Make, while the
+browser only reads their results.
+
+Verification: `node --test tests/backoffice.test.js`. This tests shared behavior
+and the live API against a simulated provider; it does not certify deployed
+Supabase permissions, Make scenarios, or live delivery latency.
+
+## Original security demonstration
+
+The browser runs on the user's device, so page-only checks cannot enforce the
+store's price or access rules.
+
+Existing deployment: `https://homeserverstore.vercel.app/`. Back Office changes
+appear there after deployment; `checkout.html` remains the security exercise.
 
 Research companion: [Browser Input, Server Checks, and Checkout Security](research/README.md).
 It covers published guidance, incident evidence, checkout-service patterns,
@@ -59,7 +108,7 @@ trigger is bypassed. [Source: Supabase API keys](https://supabase.com/docs/guide
 
 The full runbook is internal presenter preparation. The short version:
 
-1. Add an RTX 4090 to the cart, go to checkout. Toggle is on **Hidden**.
+1. Add an RTX 4090 to the cart, open **Security demo**. Toggle is on **Hidden**.
 2. DevTools → Elements → find `<input type="hidden" id="order_total">`,
    change `value` from `1599.00` to `1.00`.
 3. Submit. The demo attempts to record an order with total $1.00; no real
@@ -75,7 +124,7 @@ The full runbook is internal presenter preparation. The short version:
 ```
 browser (theirs)                    server (ours: Supabase Postgres)
 ─────────────────                   ───────────────────────────────
-product grid  ←── products table (read-only, real prices)
+checkout sum  ←── products table (read-only, real prices)
 cart          ←── localStorage (theirs entirely)
 hidden field  ──→ orders_vuln  (no catalog-total trigger)
               ──→ orders       (BEFORE INSERT trigger re-checks)
@@ -106,7 +155,7 @@ access policies, and source-derived edge cases.
 
 ## Security notes (read before reusing)
 
-- The access policies are **deliberately permissive** (open insert/select)
+- The original security-demo access policies are **deliberately permissive** (open insert/select)
   so a classroom can run this without auth. This is a teaching demo, not a
   production pattern.
 - The trigger is server-side SQL with a narrow teaching purpose. A
