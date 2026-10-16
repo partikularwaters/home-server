@@ -12,6 +12,10 @@ function configured(env) {
     env.MAKE_AUTOMATION_TOKEN && env.MAKE_PAYMENT_WEBHOOK_URL &&
     /^[0-9a-f-]{36}$/i.test(env.MAKE_DEMO_SESSION_ID || ''));
 }
+function scheduledRunsConfigured(env) {
+  return !!(env.MAKE_API_TOKEN && /^[1-9][0-9]*$/.test(env.MAKE_SCHEDULED_SCENARIO_ID || '') &&
+    /^https:\/\/[a-z0-9]+\.make\.com\/api\/v2$/.test(env.MAKE_API_BASE_URL || ''));
+}
 function createHandler(env = process.env, fetcher = fetch) {
   async function rpc(name, args) {
     const r = await fetcher(env.SUPABASE_URL + '/rest/v1/rpc/' + name, {
@@ -58,8 +62,7 @@ function createHandler(env = process.env, fetcher = fetch) {
   return async function handler(req, res) {
     res.setHeader('Cache-Control', 'no-store');
     const send = (status, data) => res.status(status).json(data);
-    if (req.method === 'GET') return send(200, { ready: configured(env), sessionId: env.MAKE_DEMO_SESSION_ID || null, manualRuns: !!(env.MAKE_API_TOKEN &&
-      env.MAKE_API_BASE_URL && env.MAKE_POLL_SCENARIO_ID && env.MAKE_RECONCILIATION_SCENARIO_ID && env.MAKE_CONDITION_SCENARIO_ID) });
+    if (req.method === 'GET') return send(200, { ready: configured(env), sessionId: env.MAKE_DEMO_SESSION_ID || null, manualRuns: scheduledRunsConfigured(env) });
     if (req.method !== 'POST') { res.setHeader('Allow', 'GET, POST'); return send(405, { error: 'Method not allowed.' }); }
     const token = String(req.headers.authorization || '').replace(/^Bearer /, '');
     const presenter = equal(token, env.DEMO_PRESENTER_TOKEN);
@@ -82,15 +85,15 @@ function createHandler(env = process.env, fetcher = fetch) {
       if (a.action === 'context') return send(200, { demo_id: a.demo_id, generation: s.generation, mode: s.mode, settings: s.settings });
       if (a.action === 'request_run') {
         if (s.mode !== 'live' || s.generation !== a.generation) throw Error('Inactive or stale executor.');
-        if (!['poll', 'reconciliation', 'condition'].includes(a.path)) throw Error('Unknown scheduled job.');
-        const scenarioId = env['MAKE_' + a.path.toUpperCase() + '_SCENARIO_ID'];
-        if (!env.MAKE_API_TOKEN || !scenarioId || !/^https:\/\/[a-z0-9]+\.make\.com\/api\/v2$/.test(env.MAKE_API_BASE_URL || ''))
-          throw Error('Cockpit run requires Make API configuration. Use Run once in the scheduled Make scenario.');
+        if (a.path !== 'scheduled') throw Error('Use the S2 scheduled engine, which runs all enabled checks.');
+        const scenarioId = env.MAKE_SCHEDULED_SCENARIO_ID;
+        if (!scheduledRunsConfigured(env))
+          throw Error('Panel runs require Make API access and the S2 scenario configuration. Use Run once in S2: Scheduled engine.');
         const r = await fetcher(env.MAKE_API_BASE_URL + '/scenarios/' + encodeURIComponent(scenarioId) + '/run', {
           method: 'POST', headers: { Authorization: 'Token ' + env.MAKE_API_TOKEN, 'Content-Type': 'application/json' },
           body: JSON.stringify({ responsive: false }), signal: AbortSignal.timeout(4000)
         });
-        if (!r.ok) throw Error('Make did not acknowledge this run. Check API access and the active scenario.');
+        if (!r.ok) throw Error('Make did not acknowledge S2. Check your plan, API access, and the active scheduled engine.');
         return send(202, { state: (await load(a.demo_id)).state, queued: true });
       }
       if (a.action === 'retry') {

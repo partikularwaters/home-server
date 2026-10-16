@@ -88,13 +88,13 @@ test('webhook validates type, paid order, and exact event identity', () => {
     assert.throws(() => h.step({ action:'webhook', order_id:ID, ...payload }));
 });
 
-function backend() {
+function backend(overrides = {}) {
   const rows = new Map(); let conflicts = 0; const hooks = [];
   const env = { SUPABASE_URL:'https://database.example', SUPABASE_SERVICE_ROLE_KEY:'server-secret',
     DEMO_PRESENTER_TOKEN:'presenter', MAKE_AUTOMATION_TOKEN:'automation', MAKE_PAYMENT_WEBHOOK_URL:'https://hook.example/pay',
     MAKE_DEMO_SESSION_ID:'00000000-0000-4000-8000-000000000001',
     MAKE_API_TOKEN:'make-secret', MAKE_API_BASE_URL:'https://eu1.make.com/api/v2',
-    MAKE_POLL_SCENARIO_ID:'12', MAKE_RECONCILIATION_SCENARIO_ID:'13', MAKE_CONDITION_SCENARIO_ID:'14' };
+    MAKE_SCHEDULED_SCENARIO_ID:'12', ...overrides };
   const fetcher = async (url, opts) => {
     const a = JSON.parse(opts.body);
     if (!url.startsWith(env.SUPABASE_URL)) { hooks.push({ url, ...a }); return { ok:true }; }
@@ -138,7 +138,7 @@ test('live adapter: authorization, CAS retry, capture, duplicate, concurrent pol
   const snapshot = (await b.call({ action:'snapshot' })).state;
   assert.equal(snapshot.orders[0].invoice, 'INV-'+ID);
   assert.equal(snapshot.events.filter(e => e.status === 'duplicate_ignored').length, 1);
-  assert.equal((await apply({ action:'request_run', path:'poll' })).status, 202);
+  assert.equal((await apply({ action:'request_run', path:'scheduled' })).status, 202);
   assert.ok(b.hooks.at(-1).url.endsWith('/scenarios/12/run'));
   await apply({ action:'reset' });
   assert.equal((await b.call({ action:'webhook', ...event }, 'automation')).status, 409);
@@ -151,4 +151,62 @@ test('Make context enables real scheduled runs; inactive executor is rejected', 
   assert.equal(context.mode, 'local');
   assert.equal((await b.call({ action:'poll', generation:1 }, 'automation')).status, 409);
   assert.equal((await b.call({ action:'snapshot' }, 'automation')).status, 403);
+});
+
+test('panel launches only S2, without simulating any scheduled work itself', async () => {
+  const b = backend();
+  assert.equal((await b.call({}, 'presenter', 'GET')).manualRuns, true);
+  assert.equal((await b.call({ action:'request_run',path:'scheduled',generation:1 })).status,409);
+  await b.call({ action:'mode',mode:'live' });
+  const before = (await b.call({ action:'snapshot' })).state;
+  assert.equal((await b.call({ action:'request_run',path:'scheduled',generation:1 })).status,409);
+  assert.equal((await b.call({ action:'request_run',path:'scheduled',generation:2 },'automation')).status,403);
+  for (const path of ['poll','reconciliation','condition'])
+    assert.equal((await b.call({ action:'request_run',path,generation:2 })).status,409);
+  const response = await b.call({ action:'request_run',path:'scheduled',generation:2 });
+  assert.equal(response.status,202);
+  assert.equal(response.queued,true);
+  assert.deepEqual(b.hooks,[{ url:'https://eu1.make.com/api/v2/scenarios/12/run',responsive:false }]);
+  assert.deepEqual(response.state,before);
+});
+test('manual run readiness requires valid S2 configuration; old scenario IDs do not enable it', async () => {
+  for (const overrides of [
+    { MAKE_API_TOKEN:undefined },
+    { MAKE_API_BASE_URL:'https://untrusted.example/api/v2' },
+    { MAKE_SCHEDULED_SCENARIO_ID:'../other' },
+    { MAKE_SCHEDULED_SCENARIO_ID:undefined,MAKE_POLL_SCENARIO_ID:'12',MAKE_RECONCILIATION_SCENARIO_ID:'13',MAKE_CONDITION_SCENARIO_ID:'14' }
+  ]) {
+    const b = backend(overrides);
+    assert.equal((await b.call({},'presenter','GET')).manualRuns,false);
+    await b.call({ action:'mode',mode:'live' });
+    const r = await b.call({ action:'request_run',path:'scheduled',generation:2 });
+    assert.equal(r.status,409);
+    assert.match(r.error,/Run once in S2/);
+    assert.equal(b.hooks.length,0);
+  }
+});
+test('combined S2 callbacks respect toggles and keep recovery and stock effects once', async () => {
+  const b = backend();
+  await b.call({ action:'mode',mode:'live' });
+  const apply = (a,token='presenter') => b.call({ generation:2,...a },token);
+  await apply({ action:'settings',settings:{ delivery:false,poll:false,armed:true } });
+  await apply({ action:'create',id:ID,items:[{id:'rtx4090',qty:1}] });
+  await apply({ action:'authorize',order_id:ID });
+  await apply({ action:'capture',order_id:ID });
+  // Age the fake provider's fixture, without sleeping or changing production records.
+  b.rows.get(b.demo_id).state.orders[0].paid_at -= 11000;
+  const context = await b.call({action:'context'},'automation');
+  assert.equal(context.mode,'live');
+  const cycle = async () => {
+    for (const action of ['poll','reconciliation','condition','retry'])
+      assert.equal((await b.call({action,generation:context.generation},'automation')).status,200);
+  };
+  await cycle(); await cycle();
+  const state = (await b.call({action:'snapshot'})).state;
+  assert.equal(state.orders[0].fulfilled_by,'reconciliation');
+  assert.equal(state.orders[0].invoice,'INV-'+ID);
+  assert.equal(state.events.filter(e=>e.kind==='condition' && e.status==='alert_issued').length,1);
+  assert.ok(state.events.some(e=>e.kind==='poll' && e.status==='paused'));
+  assert.ok(state.events.some(e=>e.kind==='reconciliation' && e.found===1));
+  assert.ok(state.events.some(e=>e.kind==='reconciliation' && e.found===0));
 });

@@ -209,3 +209,11 @@ table.prod .spec { font-size:16px; }
 .drawer .clear,.drawer .nm small { font-size:16px; }
 .drawer .qty button { width:34px; height:34px; min-height:34px; padding:0; font-size:18px; }
 .security-page .place:hover:not(:disabled) { background:var(--primary-solid-hover); }
+
+.engine-note { flex:none; margin:0; color:var(--muted-foreground); font-size:16px; line-height:1.4; }
+
+.focus-evidence { display:flex; flex-direction:column; gap:20px; flex:1; min-height:0; }
+.bo[data-mode=live] .focus-evidence { overflow:auto; scrollbar-width:thin; scrollbar-gutter:stable; }
+.bo[data-mode=live] .focus-evidence .focus-activity { flex:1 0 160px; }
+.bo[data-mode=live] .focus-evidence .focus-events { overflow:visible; }
+@media(max-height:900px) and (min-width:1121px) { .focus-evidence { gap:16px; } }

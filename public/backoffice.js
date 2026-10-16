@@ -51,7 +51,7 @@
         if (!state) await refresh();
         const r = await api({ ...a, generation:state.generation });
         state = r.state;
-        if (r.queued) notice = 'Run requested in Make. Waiting for the scenario callback.';
+        if (r.queued) notice = 'S2 scheduled checks requested. Waiting for Make callbacks.';
       } else {
         const current = localState();
         state = C.apply(current, { ...a, executor:'local', generation:current.generation }, Date.now());
@@ -107,19 +107,19 @@
       <fieldset><legend>Doorbell</legend><label><input id="bo-delivery" type="checkbox"> Webhook delivery on</label>
         <button data-bo-action="refire">Fire last webhook again</button><p class="bo-inline-note">Same event ID. One invoice.</p></fieldset>
       <fieldset><legend>Checklist</legend><label><input id="bo-poll" type="checkbox"> Poller enabled</label>
-        <label>Interval <input id="bo-pollInterval" type="number" min="1" max="86400"> s</label>
-        <button data-bo-action="poll">Run poller now</button><p id="bo-cursor" class="bo-inline-note"></p></fieldset>
+        <label data-local-only>Local interval <input id="bo-pollInterval" type="number" min="1" max="86400"> s</label>
+        <button data-local-only data-bo-action="poll">Run poller now</button><p id="bo-cursor" class="bo-inline-note"></p></fieldset>
       <fieldset><legend>Safety net</legend><label><input id="bo-reconciliation" type="checkbox"> Reconciliation enabled</label>
-        <label>Interval <input id="bo-reconciliationInterval" type="number" min="1" max="86400"> s</label>
+        <label data-local-only>Local interval <input id="bo-reconciliationInterval" type="number" min="1" max="86400"> s</label>
         <label>Paid for at least <input id="bo-threshold" type="number" min="1" max="86400"> s</label>
-        <button data-bo-action="reconciliation">Run reconciliation now</button></fieldset>
+        <button data-local-only data-bo-action="reconciliation">Run reconciliation now</button></fieldset>
       <fieldset><legend>Clock, no event</legend><label><input id="bo-condition" type="checkbox"> Condition check enabled</label>
-        <label>Interval <input id="bo-conditionInterval" type="number" min="1" max="86400"> s</label>
+        <label data-local-only>Local interval <input id="bo-conditionInterval" type="number" min="1" max="86400"> s</label>
         <label><input id="bo-armed" type="checkbox"> Arm reorder alert</label>
         <label>Stock <input id="bo-stock" type="number" min="0" max="86400"> below <input aria-label="Stock threshold" id="bo-stockThreshold" type="number" min="1" max="86400"></label>
-        <button data-bo-action="condition">Run condition check now</button></fieldset>
+        <button data-local-only data-bo-action="condition">Run condition check now</button></fieldset>
     </div><p id="bo-scheduling" class="bo-inline-note"></p>
-    <div class="bo-actions">
+    <div class="bo-actions"><button data-live-only data-bo-action="scheduled" hidden>Run scheduled checks</button>
       <button data-bo-action="reset">Reset active demo</button><button id="bo-refresh">Refresh</button></div>
 `;
   const raw = `<section class="bo-raw" id="bo-data"><h2>Orders · fulfillment belongs to the first claim</h2><div class="bo-table"><table>
@@ -132,10 +132,11 @@
     <section id="bo-presentation" class="bo-presentation" role="tabpanel" aria-labelledby="bo-orders-tab">
       <div class="focus-controls" id="focus-order-controls">${toggle('delivery','Webhook')}${toggle('poll','Polling')}${toggle('reconciliation','Recovery')}</div>
       <div class="focus-controls" id="focus-inventory-controls" hidden>${toggle('condition','Scheduled check')}${toggle('armed','Reorder alert')}</div>
-      <div class="focus-card"><div class="focus-title"><h2 id="focus-title">Next order</h2><select id="focus-order" aria-label="Inspect order" hidden></select><span id="focus-total" class="muted"></span></div><div id="focus-summary"></div></div>
-      <div class="focus-activity"><div class="activity-heading"><h2 id="focus-activity-title">Order activity</h2><button id="bo-inspect-open" class="text-action">Inspect records</button></div><div id="focus-events" class="focus-events"></div></div>
-      <div class="focus-actions" id="focus-order-actions"><button data-bo-action="refire">Resend webhook</button><button data-bo-action="poll">Run poller</button><button data-bo-action="reconciliation">Run reconciliation</button></div>
-      <div class="focus-actions" id="focus-inventory-actions" hidden><button data-bo-action="condition">Run stock check</button></div>
+      <div class="focus-evidence"><div class="focus-card"><div class="focus-title"><h2 id="focus-title">Next order</h2><select id="focus-order" aria-label="Inspect order" hidden></select><span id="focus-total" class="muted"></span></div><div id="focus-summary"></div></div>
+      <div class="focus-activity"><div class="activity-heading"><h2 id="focus-activity-title">Order activity</h2><button id="bo-inspect-open" class="text-action">Inspect records</button></div><div id="focus-events" class="focus-events"></div></div></div>
+      <p id="focus-engine-note" class="engine-note" hidden></p>
+      <div class="focus-actions" id="focus-order-actions"><button data-bo-action="refire">Resend webhook</button><button data-local-only data-bo-action="poll">Run poller</button><button data-local-only data-bo-action="reconciliation">Run reconciliation</button><button data-live-only data-bo-action="scheduled" hidden>Run scheduled checks</button></div>
+      <div class="focus-actions" id="focus-inventory-actions" hidden><button data-local-only data-bo-action="condition">Run stock check</button><button data-live-only data-bo-action="scheduled" hidden>Run scheduled checks</button></div>
     </section>`}
     <div id="bo-message" class="bo-error" role="status" aria-live="polite"></div>
     ${admin ? `<section class="bo-settings">${setup.replace('<a href="admin.html">Open admin view ↗</a>','')}</section>${raw}` : `<dialog id="bo-settings" class="bo-settings" aria-labelledby="bo-settings-title"><div class="dialog-heading"><h2 id="bo-settings-title">Presentation settings</h2><button data-close-dialog="bo-settings">Close</button></div>${setup}<p class="sub"><a href="admin.html">Open full admin view →</a></p></dialog><dialog id="bo-inspect" aria-labelledby="bo-inspect-title"><div class="dialog-heading"><h2 id="bo-inspect-title">Rehearsal records</h2><button data-close-dialog="bo-inspect">Close</button></div>${raw}</dialog>`}`;
@@ -185,8 +186,8 @@
   document.querySelectorAll('[data-bo-action]').forEach(button => {
     button.onclick = () => act(async () => {
       const action = button.dataset.boAction;
-      if (mode === 'live' && ['poll','reconciliation','condition'].includes(action))
-        await dispatch({ action:'request_run', path:action });
+      if (action === 'scheduled')
+        await dispatch({ action:'request_run', path:'scheduled' });
       else await dispatch({ action, ...(action === 'refire' ? { order_id:focusedOrder()?.id } : {}) });
       if (action === 'reset') notice = 'Active demo reset. The original security-demo tables and cart are untouched.';
     });
@@ -208,6 +209,7 @@
     const local = mode === 'local';
     document.getElementById('bo-executor').textContent = local ? 'Local Sim' : 'Make Live';
     host.dataset.delivery = state?.settings.delivery ? 'on' : 'off';
+    host.dataset.mode = mode;
     document.getElementById('bo-local').classList.toggle('active', local);
     document.getElementById('bo-live').classList.toggle('active', !local);
     document.getElementById('bo-local').setAttribute('aria-pressed', String(local));
@@ -215,19 +217,27 @@
     document.getElementById('bo-live').disabled = busy || !ready || !liveToken;
     document.getElementById('bo-local').disabled = busy;
     document.getElementById('bo-ready').textContent = ready ? 'Live server configured' : 'Local Sim available; connect to check Make Live';
+    const engineNote = manualRuns
+      ? 'S2 runs enabled checks in order. Make owns the schedule: 15 minutes in the verified rehearsal.'
+      : 'Make schedule: 15 minutes in the verified rehearsal. For presentation, use Run once in S2: Scheduled engine.';
     document.getElementById('bo-scheduling').textContent = local
-      ? 'Browser schedules active · Webhook, polling, and reconciliation share one order lifecycle.'
-      : 'Make owns the clock. Interval values here are rehearsal labels: configure matching schedules in Make. Browser refresh only reads the database.';
+      ? 'Local Sim: browser schedules use the local intervals above.'
+      : 'Make Live: S1 receives payment events; S2 runs the scheduled checks. The verified rehearsal uses a 15-minute schedule. Confirm its current schedule in Make.';
+    const engineLabel = document.getElementById('focus-engine-note');
+    if (engineLabel) { engineLabel.hidden = local; engineLabel.textContent = engineNote; }
+    if (!local) document.getElementById('bo-scheduling').textContent += ' ' + engineNote;
+    document.querySelectorAll('[data-local-only]').forEach(el => el.hidden = !local);
+    document.querySelectorAll('[data-live-only]').forEach(el => el.hidden = local);
     if (state) {
       settingsKeys.forEach(k => { const el = document.getElementById('bo-' + k); if (el.type === 'checkbox') el.checked = state.settings[k]; else if (document.activeElement !== el) el.value = state.settings[k]; });
       document.getElementById('bo-generation').textContent = state.generation;
       document.getElementById('bo-cursor').textContent = 'Cursor: ' + time(state.cursor);
     }
     document.querySelectorAll('[data-bo-action]').forEach(b => {
-      b.disabled = busy || !state || (b.closest('#focus-order-actions') && !focusedOrder()) || (b.dataset.boAction === 'refire' && !focusedOrder()?.paid_at) || (!local && !manualRuns && ['poll','reconciliation','condition'].includes(b.dataset.boAction));
-      b.title = !local && !manualRuns ? 'Set Make API access for cockpit runs, or press Run once in Make.' : '';
+      b.disabled = busy || !state || (b.closest('#focus-order-actions') && b.dataset.boAction !== 'scheduled' && !focusedOrder()) || (b.dataset.boAction === 'refire' && !focusedOrder()?.paid_at) || (b.dataset.boAction === 'scheduled' && (local || !manualRuns));
+      b.title = b.dataset.boAction === 'scheduled' && !manualRuns ? 'Use Run once in Make → S2: Scheduled engine. Panel runs require Make API access.' : '';
     });
-    document.querySelectorAll('[data-focus-setting], .bo-settings input').forEach(el => el.disabled = busy || !state);
+    document.querySelectorAll('[data-focus-setting], .bo-settings input').forEach(el => el.disabled = busy || !state || (!local && !!el.closest('[data-local-only]')));
     renderPresentation();
   }
   function renderData() {
@@ -282,7 +292,7 @@
     setHTML('focus-events', events.map(e => {
       const d = V.describe(e);
       return `<div class="focus-event ${d.tone}"><time>${esc(new Date(e.at).toLocaleTimeString('en-GB', { hour12:false }))}</time><span class="event-dot" aria-hidden="true"></span><div class="event-copy">${esc(d.title)}<div class="event-detail">${esc(d.detail)}</div></div></div>`;
-    }).join('') || `<p class="empty-evidence">${inventory ? 'Arm the alert, then run a stock check to see what the schedule finds.' : 'Payment and fulfillment events will appear here.'}</p>`);
+    }).join('') || `<p class="empty-evidence">${inventory ? (mode === 'live' ? 'Arm the alert, then run S2: Scheduled engine in Make.' : 'Arm the alert, then run a stock check to see what the schedule finds.') : 'Payment and fulfillment events will appear here.'}</p>`);
   }
   function currentOrder() { return state?.orders.find(o => o.id === new URLSearchParams(location.search).get('order')); }
   let checkoutId = crypto.randomUUID();
