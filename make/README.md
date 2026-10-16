@@ -16,7 +16,8 @@ has been created or activated in a Make account by this repository.
    browser-safe Supabase configuration.
 3. Deploy the repository through its existing Vercel workflow. The static output
    remains `public/`; the Node handler is `api/backoffice.js` at repository root.
-4. Open the cockpit, enter the presenter token, and select **Connect**, then
+4. Open **Settings** in Back Office (or use the full admin page), expand
+   **Connection settings**, enter the presenter token, and select **Connect**, then
    **Make Live**. The displayed live session UUID comes from the server's
    `MAKE_DEMO_SESSION_ID`; use the same fixed UUID in S2, S3, and S4. Requests
    for a different session are rejected. This session has its own

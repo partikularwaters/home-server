@@ -1,8 +1,14 @@
 <!DOCTYPE html>
 <html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Order confirmation — HomeServer</title><link rel="icon" href="favicon.ico"><link rel="stylesheet" href="backoffice.css"></head>
-<body class="bo-page" data-page="success"><header class="top"><a class="logo" href="index.html"><img src="favicon.ico" alt="">HomeServer</a>
-<nav aria-label="Store"><a href="index.html">Store</a><a href="admin.html">Back Office</a><a href="checkout.html">Security demo</a></nav></header>
-<main><div id="customer"><h1>Order confirmation</h1><p>Loading your order…</p></div></main><section id="backoffice" aria-label="Presenter cockpit"></section>
-<footer>Demo store · Simulated payments, invoices, and reorder alerts. Nothing is charged or shipped.</footer>
-<script src="demo-core.js"></script><script src="backoffice.js"></script></body></html>
+<title>Order confirmation — HomeServer</title><link rel="icon" href="favicon.ico"><link rel="stylesheet" href="backoffice.css"><link rel="stylesheet" href="workspace.css">
+<script src="workspace.js"></script>
+</head>
+<body class="bo-page" data-page="success"><header class="top">
+  <a class="logo" href="index.html"><img src="favicon.ico" alt="" width="20" height="20">HomeServer</a>
+  <span class="tag">Parts for local servers.</span>
+  <nav aria-label="Store"><a href="index.html">Store</a><a href="checkout.html">Security</a><a href="admin.html">Back Office</a></nav>
+  <button class="theme-toggle" type="button" aria-label="Switch to light mode" title="Switch to light mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></button>
+</header>
+<div class="workspace"><main class="customer-pane"><div id="customer"><h1>Order confirmation</h1><p>Loading your order…</p></div></main><section id="backoffice" aria-label="Back Office"></section></div>
+<footer>HomeServer · Parts for local servers.</footer>
+<script src="demo-core.js"></script><script src="backoffice-view.js"></script><script src="backoffice.js"></script></body></html>

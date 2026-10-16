@@ -21,10 +21,18 @@ server route declared at repository root.
 
 - `index.html` — storefront + cart.
 - `checkout.html` — the demo: Hidden/Protected toggle, order form, server view.
-- `payment.html` — Back Office checkout, then authorization and mock capture.
+- `payment.html` — sample checkout form; one Pay action authorizes and captures in place.
 - `order-success.html` — order number, pending/fulfilled state, and demo invoice.
-- `admin.html` — presenter cockpit with orders and event log open.
-- `backoffice.js` / `backoffice.css` — shared cockpit, customer display, and style.
+- `admin.html` — full setup controls, order history, and raw event log.
+- `backoffice.js` / `backoffice.css` — persistent Orders/Inventory presentation, customer
+  display, Settings and record-inspection dialogs, and full admin controls.
+- `backoffice-view.js` — pure projections for selected-order metrics, bounded relevant
+  activity, and descriptions that distinguish rehearsal-wide runs from order events.
+- `workspace.js` / `workspace.css` — shared navigation behavior, persistent dark/light theme,
+  and fluid desktop split. Essential text stays readable; short windows use
+  contained scrolling, and narrow windows stack the panels.
+- `theme.css` — local snapshot of Supabase’s official semantic colors and dark/light
+  themes (source URLs and retrieval date are recorded in its header).
 - `demo-core.js` — shared pure domain logic, also required by the live server.
 - `slides.html` — six talk slides (Eric 1–4, Madrid 5–6), matching the
   storefront/checkout style. Self-contained teaching illustrations; no
@@ -42,9 +50,19 @@ For slide changes: inspect all six slides, navigate both directions, and
 change/reset the illustrated hidden total on slide 3. Check that the
 checkout and storefront links on slide 5 point to the deployed pages.
 
-Back Office: `node --test tests/backoffice.test.js` from the repo root, then
+Back Office: `node --test tests/backoffice.test.js tests/backoffice-view.test.js` from the repo root, then
 `node scripts/serve-demo.js`. Rehearse all four beats from
 `../docs/DEMO-SCRIPT.md`. Local Sim needs no credentials or network. Make Live
 requires `../backoffice.sql`, server environment setup, and the four scenarios
 in `../make/README.md`; API tests use a fake provider and do not prove live
 account wiring. Reset must not touch the security-demo tables or cart.
+
+Presentation checks: rehearse the four beats at 1920 × 1080, 1440 × 900,
+and 1366 × 768. Verify the pay/action areas stay accessible, body scrolling
+is absent in the desktop split, and event text stays 18px. At a narrow or
+zoomed viewport, verify the stacked fallback without changing the cart or
+the security form’s hidden total. Reset remains scoped to the active rehearsal.
+
+Shopping navigation: Cart is beside the customer catalog heading; Checkout is
+in its cart summary. Edit cart in payment returns to `index.html#cart`. These
+actions are absent from the global navbar, which stays identical across pages.

@@ -110,37 +110,32 @@
   .empty { color:var(--mut); font-size:13px; padding:16px 0; }
   @media (max-width:620px) { .spec { display:none; } .tag { display:none; } }
 </style>
+<link rel="stylesheet" href="workspace.css">
+<script src="workspace.js"></script>
 </head>
 <body class="bo-store" data-page="store">
 
 <header class="top">
   <a class="logo" href="index.html"><img src="favicon.ico" alt="" width="20" height="20">HomeServer</a>
-  <div class="tag">Parts for local servers. Definitely not for open-weight models. <!-- wink: Madrid's pixel art --><span class="wink"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-label="Pixel-art winking smiley face"><title>Pixel wink</title><path fill="#000" d="M10 1h4v1h-4Z M7 2h10v1h-10Z M5 3h3v1h-3Z M16 3h3v1h-3Z M4 4h2v1h-2Z M18 4h2v1h-2Z M3 5h2v1h-2Z M19 5h2v1h-2Z M3 6h1v1h-1Z M7 6h2v1h-2Z M20 6h1v1h-1Z M2 7h2v1h-2Z M5 7h2v1h-2Z M20 7h2v1h-2Z M2 8h1v1h-1Z M21 8h1v1h-1Z M2 9h1v1h-1Z M8 9h2v1h-2Z M17 9h2v1h-2Z M21 9h1v1h-1Z M1 10h2v1h-2Z M7 10h3v1h-3Z M15 10h3v1h-3Z M21 10h2v1h-2Z M1 11h2v1h-2Z M7 11h3v1h-3Z M14 11h4v1h-4Z M21 11h2v1h-2Z M1 12h2v1h-2Z M8 12h2v1h-2Z M17 12h2v1h-2Z M21 12h2v1h-2Z M1 13h2v1h-2Z M21 13h2v1h-2Z M2 14h1v1h-1Z M21 14h1v1h-1Z M2 15h1v1h-1Z M8 15h2v1h-2Z M16 15h2v1h-2Z M21 15h1v1h-1Z M2 16h2v1h-2Z M9 16h3v1h-3Z M14 16h3v1h-3Z M20 16h2v1h-2Z M3 17h1v1h-1Z M11 17h4v1h-4Z M20 17h1v1h-1Z M3 18h2v1h-2Z M19 18h2v1h-2Z M4 19h2v1h-2Z M18 19h2v1h-2Z M5 20h3v1h-3Z M16 20h3v1h-3Z M7 21h10v1h-10Z M10 22h4v1h-4Z"/></svg></span></div>
-  <div class="spacer"></div>
-  <a href="checkout.html" style="color:var(--blue);font-size:13px">Security demo</a>
-  <a class="checkoutbtn" href="payment.html">Checkout →</a>
-  <button class="cartbtn" id="cartbtn" onclick="toggleCart(true)">Cart (<span id="ccount">0</span>)</button>
+  <span class="tag">Parts for local servers.</span>
+  <nav aria-label="Store"><a href="index.html">Store</a><a href="checkout.html">Security</a><a href="admin.html">Back Office</a></nav>
+  <button class="theme-toggle" type="button" aria-label="Switch to light mode" title="Switch to light mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></button>
 </header>
 
-<main>
-  <h1>Server parts</h1>
+<div class="workspace"><main class="customer-pane">
+  <div class="store-heading"><h1>Server parts</h1>
+  <button class="cartbtn" id="cartbtn" type="button" aria-controls="shopping-cart" aria-expanded="false" onclick="toggleCart(true)">Cart (<span id="ccount">0</span>)</button>
+  </div>
+  <div class="catalog-scroll">
   <p class="sub">GPUs, boards, storage, power. For homelabs. In stock, ships fast.</p>
   <div id="banner-slot"></div>
   <table class="prod" id="ptable" aria-label="Products">
-    <thead><tr><th></th><th>Product</th><th>Spec</th><th>Price</th><th></th></tr></thead>
+    <thead><tr><th></th><th>Product</th><th class="spec">Spec</th><th>Price</th><th></th></tr></thead>
     <tbody id="prows"><tr><td colspan="5" class="spec">Loading catalog…</td></tr></tbody>
   </table>
-</main>
-
-<section id="backoffice" aria-label="Presenter cockpit"></section>
-
-<footer class="bot">
-  <span>Demo store · Webhooks, polling, and browser security. Not a real store.</span>
-  <span>AI Operations Specialist Training 2026 | Acosta &amp; Madrid</span>
-</footer>
-
+  </div>
 <div class="scrim" onclick="toggleCart(false)"></div>
-<aside class="drawer" aria-label="Cart">
+<aside class="drawer" id="shopping-cart" aria-label="Cart" inert>
   <header><h2>Cart</h2><button class="x" onclick="toggleCart(false)" aria-label="Close">×</button></header>
   <div class="ditems" id="ditems"></div>
   <div class="dfoot">
@@ -149,6 +144,16 @@
     <button class="clear" onclick="clearCart()">Clear cart</button>
   </div>
 </aside>
+</main>
+
+<section id="backoffice" aria-label="Back Office"></section></div>
+
+<footer class="bot">
+  <span>HomeServer · Parts for local servers.</span>
+  <span>AI Operations Specialist Training 2026 | Acosta &amp; Madrid</span>
+</footer>
+
+
 
 <script src="demo-core.js"></script>
 <script>
@@ -253,12 +258,20 @@ function renderCart() {
 }
 function toggleCart(open) {
   document.body.classList.toggle("cart-open", open);
+  document.getElementById("shopping-cart").inert = !open;
+  document.getElementById("cartbtn").setAttribute("aria-expanded", String(open));
+  if (open) document.querySelector(".drawer .x").focus();
+  else document.getElementById("cartbtn").focus();
 }
 
 loadCart();
 renderCart();
 loadProducts();
+if (location.hash === "#cart") toggleCart(true);
+document.addEventListener("keydown", function (event) {
+  if (event.key === "Escape" && document.body.classList.contains("cart-open")) toggleCart(false);
+});
 </script>
-<script src="backoffice.js"></script>
+<script src="backoffice-view.js"></script><script src="backoffice.js"></script>
 </body>
 </html>

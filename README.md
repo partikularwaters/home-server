@@ -6,11 +6,23 @@ to customers, or goods shipped.
 
 ## Back Office: webhooks versus polling
 
-The storefront's **Checkout** opens a mock gateway with separate authorization
-and capture, then a conventional order confirmation. The presenter cockpit
-below the store shows the order lifecycle, one invoice per order, which path
-fulfilled it, and every delivery attempt and scheduled run. **Security demo**
-still opens the original Hidden/Protected checkout.
+Open **Cart** beside the product list, then choose **Checkout** in its summary. This opens a conventional checkout with saved sample
+contact and delivery details, a masked card, and one **Pay** action. Authorization
+and capture happen automatically, and confirmation updates in the same frame.
+The persistent Back Office beside it has **Orders** and **Inventory** views.
+Orders emphasizes the selected order's fulfillment source, delivery attempts,
+invoice count, and relevant activity. Inventory shows the scheduled condition
+and its alert. **Inspect records** opens the complete rehearsal tables.
+
+**Settings** holds connection setup, execution mode, intervals, and scoped
+reset. The **Back Office** navigation link opens the full admin view with all
+controls and raw tables. **Security** opens the original Hidden/Protected
+exercise, preserving its hidden total between submissions.
+
+The interface defaults to Supabase's official dark theme, with a discreet
+sun/moon toggle for light mode. Desktop columns adapt to the browser window;
+short windows scroll content within panels while actions stay accessible.
+Narrow windows stack the panels without shrinking essential text.
 
 Run `node scripts/serve-demo.js` and open `http://127.0.0.1:8080/`. Local Sim is
 the default; it needs no credentials or external service. The storefront uses
@@ -43,7 +55,7 @@ Make API configuration is additionally required for cockpit Run now buttons;
 otherwise use Run once in Make. Live schedules execute in Make, while the
 browser only reads their results.
 
-Verification: `node --test tests/backoffice.test.js`. This tests shared behavior
+Verification: `node --test tests/backoffice.test.js tests/backoffice-view.test.js`. This tests shared behavior
 and the live API against a simulated provider; it does not certify deployed
 Supabase permissions, Make scenarios, or live delivery latency.
 
@@ -112,7 +124,7 @@ The full runbook is internal presenter preparation. The short version:
 2. DevTools → Elements → find `<input type="hidden" id="order_total">`,
    change `value` from `1599.00` to `1.00`.
 3. Submit. The demo attempts to record an order with total $1.00; no real
-   payment occurs. Expand **Server view** to inspect the readback. Its
+   payment occurs. Inspect the persistent **Server View** to see the readback. Its
    comparison labels are calculated in the browser.
 4. Flip the toggle to **Protected**. Repeat the edit. Submit.
 5. With the seeded GPU price, the trigger raises

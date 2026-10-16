@@ -19,7 +19,7 @@
   .demobar {
     flex:none; display:flex; align-items:center; gap:14px;
     padding:8px 18px; color:#111;
-    background:repeating-linear-gradient(-45deg,#ffe08a,#ffe08a 14px,#ffd063 14px,#ffd063 28px);
+    background:transparent;
     border-bottom:2px solid var(--ink);
   }
   .dlabel { font-weight:800; font-size:12px; letter-spacing:.08em; }
@@ -101,40 +101,42 @@
   .st-ok { color:#3fb950; } .st-bad { color:#f85149; }
   @media (max-width:700px) { main { grid-template-columns:1fr; overflow:auto; } .tag { display:none; } }
 </style>
+<link rel="stylesheet" href="workspace.css">
+<script src="workspace.js"></script>
 </head>
-<body>
+<body class="security-page">
 
 <header class="top">
   <a class="logo" href="index.html"><img src="favicon.ico" alt="" width="20" height="20">HomeServer</a>
-  <div class="tag">Parts for local servers. Definitely not for open-weight models. <!-- wink: Madrid's pixel art --><span class="wink"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" shape-rendering="crispEdges" aria-label="Pixel-art winking smiley face"><title>Pixel wink</title><path fill="#000" d="M10 1h4v1h-4Z M7 2h10v1h-10Z M5 3h3v1h-3Z M16 3h3v1h-3Z M4 4h2v1h-2Z M18 4h2v1h-2Z M3 5h2v1h-2Z M19 5h2v1h-2Z M3 6h1v1h-1Z M7 6h2v1h-2Z M20 6h1v1h-1Z M2 7h2v1h-2Z M5 7h2v1h-2Z M20 7h2v1h-2Z M2 8h1v1h-1Z M21 8h1v1h-1Z M2 9h1v1h-1Z M8 9h2v1h-2Z M17 9h2v1h-2Z M21 9h1v1h-1Z M1 10h2v1h-2Z M7 10h3v1h-3Z M15 10h3v1h-3Z M21 10h2v1h-2Z M1 11h2v1h-2Z M7 11h3v1h-3Z M14 11h4v1h-4Z M21 11h2v1h-2Z M1 12h2v1h-2Z M8 12h2v1h-2Z M17 12h2v1h-2Z M21 12h2v1h-2Z M1 13h2v1h-2Z M21 13h2v1h-2Z M2 14h1v1h-1Z M21 14h1v1h-1Z M2 15h1v1h-1Z M8 15h2v1h-2Z M16 15h2v1h-2Z M21 15h1v1h-1Z M2 16h2v1h-2Z M9 16h3v1h-3Z M14 16h3v1h-3Z M20 16h2v1h-2Z M3 17h1v1h-1Z M11 17h4v1h-4Z M20 17h1v1h-1Z M3 18h2v1h-2Z M19 18h2v1h-2Z M4 19h2v1h-2Z M18 19h2v1h-2Z M5 20h3v1h-3Z M16 20h3v1h-3Z M7 21h10v1h-10Z M10 22h4v1h-4Z"/></svg></span></div>
-  <div class="spacer"></div>
-  <a class="crumb" href="payment.html">Payment demo →</a>
-  <span class="crumb">Security checkout</span>
+  <span class="tag">Parts for local servers.</span>
+  <nav aria-label="Store"><a href="index.html">Store</a><a href="checkout.html">Security</a><a href="admin.html">Back Office</a></nav>
+  <button class="theme-toggle" type="button" aria-label="Switch to light mode" title="Switch to light mode"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg></button>
 </header>
 
-<div class="demobar">
-  <span class="dlabel">DEMO MODE</span>
-  <div class="seg" role="group" aria-label="Demo mode">
-    <button id="m-hidden" class="on" onclick="setMode('hidden')">Hidden</button><button id="m-protected" onclick="setMode('protected')">Protected</button>
-    <div class="seg-slide" id="segslide" aria-hidden="true"><span>Hidden</span><span>Protected</span></div>
-  </div>
-  <span class="dnote">Not a store feature. Picks which order table the checkout writes to.</span>
-</div>
+<div class="workspace"><main id="main" class="customer-pane"><h1>Checkout</h1><p class="sub">Loading your order…</p></main>
 
-<main id="main"></main>
 
-<section id="spanel" aria-label="Server view">
-  <div class="shead" onclick="toggleServer()">
-    <span id="schev">▸</span>
-    <span class="t">SERVER VIEW</span>
+<section id="spanel" class="open" aria-label="Server view">
+  <div class="shead">
+    <span id="schev" hidden></span>
+    <span class="t">Server View</span>
     <span class="live">● live from Supabase</span>
     <button class="srefresh" id="srefresh" onclick="event.stopPropagation();refreshServer()">Refresh</button>
   </div>
+<div class="demobar">
+
+  <div class="seg" role="group" aria-label="Demo mode">
+    <button id="m-hidden" class="on" aria-pressed="true" onclick="setMode('hidden')">Hidden</button><button id="m-protected" aria-pressed="false" onclick="setMode('protected')">Protected</button>
+    <div class="seg-slide" id="segslide" aria-hidden="true"><span>Hidden</span><span>Protected</span></div>
+  </div>
+  <span class="dnote">Select the database validation policy.</span>
+</div>
   <div class="sbody"><table class="srv" id="stable">
     <thead><tr><th>time</th><th>table</th><th>customer</th><th>items</th><th>total</th><th>status</th></tr></thead>
-    <tbody id="srows"><tr><td colspan="6" style="color:#8b949e">Expand to inspect what the server actually stored.</td></tr></tbody>
+    <tbody id="srows"><tr><td colspan="6" style="color:#8b949e">Orders stored by the server appear here.</td></tr></tbody>
   </table></div>
-</section>
+</section></div>
+<footer>HomeServer · Parts for local servers.</footer>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="config.js"></script>
@@ -163,16 +165,12 @@ function sb() {
 }
 function tableFor(mode) { return mode === "hidden" ? "orders_vuln" : "orders"; }
 
-function toggleServer() {
-  var p = document.getElementById("spanel");
-  p.classList.toggle("open");
-  document.getElementById("schev").textContent = p.classList.contains("open") ? "▾" : "▸";
-}
-
 function setMode(m) {
   MODE = m;
   document.getElementById("m-hidden").classList.toggle("on", m === "hidden");
   document.getElementById("m-protected").classList.toggle("on", m === "protected");
+  document.getElementById("m-hidden").setAttribute("aria-pressed", String(m === "hidden"));
+  document.getElementById("m-protected").setAttribute("aria-pressed", String(m === "protected"));
   hideResult();
   moveSlide();
 }
@@ -263,7 +261,7 @@ async function placeOrder() {
     // the demo flow to one motion: flip the toggle, submit again.
     showResult(true, "Order recorded. Charged " + money(claimed) + ".",
       "Order <code>" + esc(oid) + "</code> is now in the <code>" +
-      esc(table) + "</code> table. Check the server view below.");
+      esc(table) + "</code> table. Check the server view alongside checkout.");
   } catch (e) {
     showResult(false, "Rejected by the server.",
       esc(e.message) + "<br>Nothing was written. " +
@@ -299,7 +297,7 @@ async function refreshServer() {
     (ph.data || []).forEach(function (o) { o._mode = "protected"; rows.push(o); });
     rows.sort(function (a, b) { return new Date(b.created_at) - new Date(a.created_at); });
     if (!rows.length) {
-      body.innerHTML = '<tr><td colspan="6" style="color:#8b949e">No orders yet. Place one above.</td></tr>';
+      body.innerHTML = '<tr><td colspan="6" style="color:#8b949e">No orders yet. Place an order in checkout.</td></tr>';
       return;
     }
     var html = "";
