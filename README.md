@@ -61,16 +61,18 @@ toggles, manual runs, mode selection, and reset. Local Sim and Make Live have
 separate rehearsal data. Reset clears only the active rehearsal, preserving
 the cart and original security-demo tables.
 
-**Make Live setup:** see [the four scenario contracts and setup guide](make/README.md),
+**Make Live setup:** see [the two-scenario setup guide and sanitized exports](make/README.md),
 [`backoffice.sql`](backoffice.sql), and [server-only environment template](.env.backoffice.example).
-Live services must be configured and rehearsed before presenting. The code and
-request templates do not create Make scenarios or apply the migration for you.
+Live services must be configured and rehearsed before presenting. The sanitized exports represent S1 (Instant fulfillment) and S2 (Scheduled engine).
+Importing them does not configure credentials, apply the migration, or activate a schedule.
 The cockpit does not enable Make Live until its server configuration is present.
-Make API configuration is additionally required for cockpit Run now buttons;
-otherwise use Run once in Make. Live schedules execute in Make, while the
-browser only reads their results.
+Make Live uses one **Run scheduled checks** action for S2, which runs polling,
+reconciliation, stock checks, and retries in order. It requires optional Make API
+access; otherwise use **Run once in S2: Scheduled engine**. The verified live
+schedule is approximately 15 minutes. Short interval settings apply only to
+Local Sim and are hidden in Make Live. The four demo beats use two scenarios.
 
-Verification: `node --test tests/backoffice.test.js tests/backoffice-view.test.js`. This tests shared behavior
+Verification: `node --test tests/backoffice.test.js tests/backoffice-view.test.js tests/make-blueprints.test.js`. This tests shared behavior
 and the live API against a simulated provider; it does not certify deployed
 Supabase permissions, Make scenarios, or live delivery latency.
 

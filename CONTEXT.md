@@ -12,7 +12,7 @@ webhooks versus polling in Back Office, and Hidden/Protected browser security.
 | `schema.sql` | Supabase `products`, `orders_vuln`, `orders` tables |
 | `backoffice.sql` | Isolated live rehearsal sessions, atomic updates, and inspection views |
 | `api/backoffice.js` | Vercel server boundary for mock payments and Make callbacks |
-| `make/` | Four Make scenario contracts, setup, and live acceptance checks |
+| `make/` | Two sanitized Make scenario exports, setup, and live acceptance checks |
 | `tests/` | Shared lifecycle and live API regression checks |
 | `scripts/serve-demo.js` | Dependency-free local static and API preview |
 | `build-config.js` | Build step: writes `public/config.js` from Vercel env vars |

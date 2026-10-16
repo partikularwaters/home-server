@@ -30,3 +30,19 @@ links to these primary sources. It does not execute the order model.
 No provider account was queried for this research. No real transaction, live
 Make acceptance test, latency benchmark, or historic incident reproduction was
 performed. The illustrative scenarios are explicitly separate from source facts.
+
+
+## Make implementation references · reviewed 2026-10-16
+
+- [Make webhooks](https://help.make.com/webhooks): event-triggered scenario processing.
+- [Make scheduling](https://help.make.com/schedule-a-scenario): schedules and manual runs.
+- [Make pricing](https://www.make.com/en/pricing): current plan limits; the account
+  constraint is two active scenarios, with an observed 15-minute live schedule.
+- [Make scenario API](https://developers.make.com/api-documentation/api-reference/scenarios):
+  active-scenario launch and asynchronous `responsive=false` requests.
+- [Make authentication](https://developers.make.com/api-documentation/authentication/create-authentication-token):
+  private API token setup, conditional on the account's available access.
+
+The sanitized blueprints in `make/` are repository evidence for the actual module
+order. The schedule note is based on observed callbacks, not an inference from
+the blueprint's missing schedule or an account-wide API entitlement test.

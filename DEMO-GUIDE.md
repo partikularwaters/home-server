@@ -66,6 +66,23 @@ Security requires the configured Supabase project and installed schema. A
 network failure is not proof that the price rule rejected a request. The
 Back Office reset does not clear these security tables.
 
+## Make Live: two scenarios, four beats
+
+S1: Instant fulfillment is the webhook receiver and callback. S2: Scheduled
+engine performs context → live-mode filter → polling → reconciliation → stock
+condition → delivery retries. The four demo beats below are behaviors, not
+four separate Make scenarios.
+
+In Make Live, **Run scheduled checks** starts all of S2. If that optional API
+integration is unavailable, use **Run once in S2: Scheduled engine** in Make.
+The current account's actual schedule runs roughly every 15 minutes. The
+30/60/20-second browser intervals are for Local Sim and are hidden in Make Live.
+See the [step-by-step Make guide and sanitized exports](make/README.md).
+
+For each beat below, individual Run poller, Run reconciliation, and Run stock
+check buttons refer to **Local Sim**. In **Make Live**, run S2 instead. Its
+switches determine which checks can act; one execution can add several log entries.
+
 ## Back Office: prepare once
 
 1. Open **Settings** in the side panel, select **Local Sim**, and press
@@ -93,7 +110,8 @@ The order dropdown can inspect an earlier order. A new checkout shows **Next ord
 - **Recovery** runs reconciliation for paid, unfulfilled orders old enough to qualify.
 - **Inspect records** opens the complete order/event tables if someone asks for detail.
 
-The manual run buttons respect their corresponding On/Off switches. Poll and
+Local manual run buttons respect their corresponding On/Off switches. In live
+S2, polling is evaluated before reconciliation, then stock and retries follow. Poll and
 reconciliation results count eligible orders across the active rehearsal,
 not only the selected order. Other unfulfilled orders can therefore change the
 result. Start with a reset when you want the clean four-beat story below.
@@ -101,7 +119,7 @@ result. Start with a reset when you want the clean four-beat story below.
 ## Beat 1: Speed
 
 **Do:** Leave all three switches On. Press **Pay** once. After confirmation,
-press **Run poller**.
+press **Run poller** in Local Sim, or run **S2** in Make Live.
 
 **Show:** Fulfilled by webhook; one invoice; the later poll finds zero eligible
 paid orders in this clean rehearsal.
@@ -133,7 +151,8 @@ Failed deliveries retry after approximately 1, 2, and 4 seconds, with four
 attempts in total. Browser scheduling can delay these attempts.
 
 **Then:** Wait until the new payment is at least **10 seconds old**, and press
-**Run reconciliation**, or wait for its schedule. The same customer confirmation
+**Run reconciliation** in Local Sim, or run **S2** in Make Live. You can also
+wait for the actual schedule. The same customer confirmation
 updates, the fulfillment source becomes reconciliation, and one invoice appears.
 A scheduled recovery run may already have handled it before your manual click.
 
@@ -148,7 +167,8 @@ create another invoice.
 
 **Do:** Switch to **Inventory**. Keep **Scheduled check On**, and turn
 **Reorder alert On**. In Settings, confirm stock **3** and threshold **5**.
-Press **Run stock check**, or observe the scheduled result if it fired first.
+Press **Run stock check** in Local Sim, or run **S2** in Make Live. Observe
+the scheduled result instead if it fired first.
 
 **Show:** Stock is below the threshold, and the alert count is **1**. Run the
 check again: the same condition produces no second alert. Turn Reorder alert
@@ -167,8 +187,9 @@ scenarios. Both simulate payment; neither is a Stripe integration.
 
 Follow [Make setup and acceptance checks](make/README.md) before using Make Live.
 It requires server configuration, a presenter connection, matching session and
-generation, and configured scenarios. The panel's manual runs need Make API
-configuration; otherwise run the scenario from Make. Live retry timing depends
+generation, and the two configured scenarios. The panel's scheduled-engine run
+needs Make API access and `MAKE_SCHEDULED_SCENARIO_ID`; otherwise use Run once
+in S2 from Make. Live retry timing depends
 on the actual schedules. Local tests do not establish live wiring or latency.
 
 ## Recover during rehearsal
@@ -193,10 +214,17 @@ the original security tables.
 ## Verification boundary
 
 ```sh
-node --test tests/backoffice.test.js tests/backoffice-view.test.js
+node --test tests/backoffice.test.js tests/backoffice-view.test.js tests/make-blueprints.test.js
 ```
 
-The current suite has 18 checks for lifecycle behavior, evidence projections,
+The current suite has 23 checks for lifecycle behavior, evidence projections,
 and the API with a fake provider. This is separate from a deployed Make/Supabase
 acceptance run. The browser walkthrough was exercised locally on 2026-10-16;
 rehearse again in the actual presentation browser.
+
+
+Production rehearsal on 2026-10-16 verified S1 fulfillment and duplicate handling,
+S2 reconciliation after a missed notification, and one stock alert across repeated
+S2 runs. The approximately 15-minute live schedule differs from local timing.
+The optional panel API trigger still requires account-level configuration and
+acceptance; readiness is configuration detection, not an entitlement check.

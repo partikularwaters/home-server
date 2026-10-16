@@ -54,10 +54,10 @@ For slide changes: inspect all six slides, navigate both directions, and
 change/reset the illustrated hidden total on slide 3. Check that the
 checkout and storefront links on slide 5 point to the deployed pages.
 
-Back Office: `node --test tests/backoffice.test.js tests/backoffice-view.test.js` from the repo root, then
+Back Office: `node --test tests/backoffice.test.js tests/backoffice-view.test.js tests/make-blueprints.test.js` from the repo root, then
 `node scripts/serve-demo.js`. Rehearse all four beats from
 `../docs/DEMO-SCRIPT.md`. Local Sim needs no credentials or network. Make Live
-requires `../backoffice.sql`, server environment setup, and the four scenarios
+requires `../backoffice.sql`, server environment setup, and the two scenarios
 in `../make/README.md`; API tests use a fake provider and do not prove live
 account wiring. Reset must not touch the security-demo tables or cart.
 
@@ -75,3 +75,15 @@ Back Office slide checks: navigate all eight slides forward and backward,
 verify hash links, theme toggle, fullscreen control, and demo link, and inspect
 fit at 1920 × 1080 and 1366 × 768. Public research and the versioned operating
 guide live at `../research/webhooks/` and `../DEMO-GUIDE.md`.
+
+
+Make Live uses S1 (payment webhook) and S2 (context, live-mode filter, poll,
+reconciliation, condition, retry). The live panel's Run scheduled checks launches
+only S2 through the server if optional Make API access is configured; otherwise
+it visibly directs presenters to Run once in Make. Individual job buttons and
+short interval inputs are Local Sim controls. The live 15-minute note records
+the observed rehearsal schedule rather than querying Make's schedule API.
+
+Live evidence scrolls as one contained area in short desktop windows, reserving
+the S2 instruction and action buttons below it. Local Sim retains individual
+check buttons and its existing evidence behavior.

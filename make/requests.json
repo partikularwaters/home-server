@@ -1,16 +1,19 @@
 {
-  "notes": "HTTP module body templates, not importable Make blueprints. Replace session placeholders; map generation from context for scheduled jobs. Configure private Authorization headers in Make.",
+  "notes": "Body templates for two scenarios; these are not an importable blueprint. S2 runs its five HTTP modules in this order, with the live-mode filter after context. Map numeric generation from the context response. Configure Authorization privately.",
   "S1_instant_fulfillment": {
     "action": "webhook",
     "demo_id": "{{webhook.demo_id}}",
     "generation": "{{webhook.generation: map as a JSON number}}",
-    "type": "payment.succeeded",
+    "type": "{{webhook.type}}",
     "event_id": "{{webhook.event_id}}",
     "order_id": "{{webhook.order_id}}"
   },
-  "scheduled_context": { "action": "context", "demo_id": "YOUR_COCKPIT_SESSION_UUID" },
-  "S2_poll_fulfillment": { "action": "poll", "demo_id": "YOUR_COCKPIT_SESSION_UUID", "generation": "{{context.generation: map as a JSON number}}" },
-  "S3_reconciliation": { "action": "reconciliation", "demo_id": "YOUR_COCKPIT_SESSION_UUID", "generation": "{{context.generation: map as a JSON number}}" },
-  "S4_condition_check": { "action": "condition", "demo_id": "YOUR_COCKPIT_SESSION_UUID", "generation": "{{context.generation: map as a JSON number}}" },
-  "retry_due_deliveries": { "action": "retry", "demo_id": "YOUR_COCKPIT_SESSION_UUID", "generation": "{{context.generation: map as a JSON number}}" }
+  "S2_scheduled_engine": {
+    "context": { "action": "context", "demo_id": "YOUR_COCKPIT_SESSION_UUID" },
+    "live_mode_filter": "context.mode equals live",
+    "poll": { "action": "poll", "demo_id": "YOUR_COCKPIT_SESSION_UUID", "generation": "{{context.generation: map as a JSON number}}" },
+    "reconciliation": { "action": "reconciliation", "demo_id": "YOUR_COCKPIT_SESSION_UUID", "generation": "{{context.generation: map as a JSON number}}" },
+    "condition": { "action": "condition", "demo_id": "YOUR_COCKPIT_SESSION_UUID", "generation": "{{context.generation: map as a JSON number}}" },
+    "retry": { "action": "retry", "demo_id": "YOUR_COCKPIT_SESSION_UUID", "generation": "{{context.generation: map as a JSON number}}" }
+  }
 }

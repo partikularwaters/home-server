@@ -45,9 +45,9 @@
 <p class="takeaway">This demo checks a condition. Real inventory systems can also publish events.</p><p class="source">HomeServer Inventory model · an internal alert record, with no supplier order</p>
 </section>
 <section class="slide" id="slide-7" aria-labelledby="title-7" inert>
-<div><p class="eyebrow">Live demo · HomeServer</p><h2 id="title-7">Follow the customer and the Back Office</h2><p class="lead">Watch fulfillment source, delivery attempts, and the invoice count.</p></div>
-<div class="steps"><div class="beat"><h3>Speed</h3><p>Pay → webhook fulfills → poll finds zero.</p></div><div class="beat"><h3>Twice</h3><p>Resend → attempts increase → invoice stays one.</p></div><div class="beat"><h3>Never</h3><p>Delivery and polling Off → paid but pending → recovery.</p></div><div class="beat"><h3>Condition</h3><p>Arm low-stock alert → check → one alert.</p></div></div>
-<div class="actions"><a class="button" href="index.html" target="_blank" rel="noopener">Open HomeServer →</a><span class="fine">Use the prepared Local Sim rehearsal.</span></div><p class="source">Mock payment flow · live integration setup is a separate check</p>
+<div><p class="eyebrow">Live demo · HomeServer</p><h2 id="title-7">Follow the customer and the Back Office</h2><p class="lead">S1 handles payment events. S2 runs polling, recovery, stock checks, and retries.</p></div>
+<div class="steps"><div class="beat"><h3>Speed</h3><p>Pay → S1 fulfills → S2 polling finds zero.</p></div><div class="beat"><h3>Twice</h3><p>Resend → S1 ignores duplicate → invoice stays one.</p></div><div class="beat"><h3>Never</h3><p>Delivery and polling Off → wait → S2 recovers.</p></div><div class="beat"><h3>Condition</h3><p>Arm low-stock alert → run S2 → one alert.</p></div></div>
+<div class="actions"><a class="button" href="index.html" target="_blank" rel="noopener">Open HomeServer →</a><span class="fine">Local Sim: individual checks. Make Live: run S2.</span></div><p class="source">Two scenarios, four beats · Make Live: Run once in S2, or Run scheduled checks when configured</p>
 </section>
 <section class="slide" id="slide-8" aria-labelledby="title-8" inert>
 <div><p class="eyebrow">Design the workflow around unfinished work</p><h2 id="title-8">React quickly.<br>Handle repeats safely.<br>Recover what was missed.</h2></div>

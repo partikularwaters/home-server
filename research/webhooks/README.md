@@ -3,6 +3,10 @@
 A public companion to HomeServer's Back Office talk. Reviewed **2026-10-16**
 against primary documentation and the repository's supplied implementation.
 
+The live implementation uses **two Make scenarios**: S1 for payment webhooks,
+and S2 for scheduled checks. Speed, Twice, Never, and Condition are the four
+presentation beats, not separate scenarios.
+
 The central question: **How does a business finish the work after a payment,
 even when notifications repeat or fail?**
 

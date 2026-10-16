@@ -35,7 +35,7 @@ Static site (Vercel) + Supabase backend. Not a real store.
 - Never put Back Office server keys or Make tokens in `public/` or build output.
 - Back Office reset is scoped to its active rehearsal; never delete original
   `orders`, `orders_vuln`, or `products`. Test with
-  `node --test tests/backoffice.test.js`; preview with `node scripts/serve-demo.js`.
+  `node --test tests/backoffice.test.js tests/backoffice-view.test.js tests/make-blueprints.test.js`; preview with `node scripts/serve-demo.js`.
 - `public/` is the deploy root: don't move it, don't reference anything
   outside it from the pages.
 - Keep the `CONTEXT.md` files current when the structure changes.

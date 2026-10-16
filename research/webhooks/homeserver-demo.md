@@ -28,7 +28,10 @@ Background throttling and closing pages affect timing.
 
 Make Live calls a server route that checks caller role, active rehearsal session,
 and generation. The server uses versioned state updates with compare-and-swap
-retries in Supabase. Make receives notifications and runs scheduled callbacks.
+retries in Supabase. Make uses two scenarios: S1 receives payment notifications, and S2 runs the
+ordered context → live-mode filter → poll → reconciliation → condition → retry
+chain. A paused poll does not prevent the later recovery step from acting.
+An HTTP error can stop the chain before later modules execute.
 Tokens and server configuration are not part of the static browser build.
 Switching mode and resetting changes the generation to reject stale callbacks.
 The full live setup is in the [Make guide](../../make/README.md).
@@ -67,18 +70,37 @@ can share a timestamp. This does not establish network delivery latency.
 
 ## Checks and remaining limits
 
-The 18 automated checks cover domain paths, retries, stale generations, cursor
+The 23 automated checks cover domain paths, retries, stale generations, cursor
 boundaries, competing claims, the live API with a fake provider, and evidence
 projection. Run them with:
 
 ```sh
-node --test tests/backoffice.test.js tests/backoffice-view.test.js
+node --test tests/backoffice.test.js tests/backoffice-view.test.js tests/make-blueprints.test.js
 ```
 
 The four beats were also exercised in the local browser during UI work on
-2026-10-16. That establishes a local rehearsal, not deployed integration acceptance.
+2026-10-16. A separate production rehearsal on that date verified webhook fulfillment,
+duplicate handling, reconciliation, and once-per-condition alerts through the
+existing two Make scenarios. It did not enable or validate the optional Make
+API launch from the panel. The scheduled engine ran roughly every 15 minutes.
 No general exactly-once transport guarantee follows from these checks.
 Real integrations also need authenticated provider messages, durable processing,
 provider-specific histories, and safe external side effects. HomeServer does
 not implement a production payment provider's signature verification or full
 refund, dispute, delayed-payment, or out-of-order lifecycle.
+
+
+## Two scenarios in the presentation interface
+
+Local Sim retains individual check buttons and short browser intervals. Make
+Live shows one Run scheduled checks action, which starts all enabled work in
+S2 when the optional API connection is configured. Otherwise, a visible note
+points to Run once inside S2 in Make. Short local intervals are hidden in live
+mode. The 15-minute live note describes the verified account, not a schedule
+read dynamically from Make.
+
+The sanitized [S1](<../../make/S1- Instant fulfillment.blueprint.json>) and
+[S2](<../../make/S2- Scheduled engine.blueprint.json>) exports preserve modules
+and mapping expressions but require private credentials, a deployment URL,
+a session UUID, and a reconnected webhook when imported. They do not create
+four independent scenarios or configure an account automatically.
