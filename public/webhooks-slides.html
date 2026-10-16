@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>After the Payment — Webhooks and Polling · HomeServer</title>
+<link rel="icon" href="favicon.ico">
+<link rel="stylesheet" href="theme.css">
+<script src="workspace.js"></script>
+<style>
+:root{color-scheme:dark}html[data-theme=light]{color-scheme:light}*{box-sizing:border-box}html,body{margin:0;height:100%}body{display:flex;flex-direction:column;height:100dvh;background:var(--background);color:var(--foreground);font:22px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overflow:hidden}a{color:var(--primary)}button{font:inherit;cursor:pointer}button,a{touch-action:manipulation}button:focus-visible,a:focus-visible{outline:3px solid var(--primary);outline-offset:5px}button:disabled{opacity:.35;cursor:default}.top{height:76px;flex:none;display:flex;align-items:center;gap:30px;padding:0 40px;border-bottom:1px solid var(--border)}.logo{font-size:24px;font-weight:700;letter-spacing:-.6px;color:var(--foreground);text-decoration:none}.top .topic{color:var(--muted-foreground);font-size:18px;margin-left:auto}.theme-toggle{display:grid;place-items:center;width:42px;height:42px;border:0;border-radius:7px;background:transparent;color:var(--muted-foreground)}.theme-toggle:hover{background:var(--muted)}.theme-toggle svg{width:23px;height:23px}main{flex:1;min-height:0;overflow:auto}.slide{display:none;max-width:1580px;margin:auto;min-height:100%;padding:clamp(28px,4vh,52px) 64px;flex-direction:column;justify-content:center;gap:32px}.slide.on{display:flex}h1,h2,h3,p{margin:0}h1{font-size:clamp(52px,4.6vw,86px);line-height:1.06;letter-spacing:-.045em;max-width:1100px}h2{font-size:clamp(40px,3.5vw,64px);line-height:1.12;letter-spacing:-.035em;max-width:1200px}h3{font-size:29px;line-height:1.2}.lead{font-size:clamp(23px,1.8vw,32px);color:var(--muted-foreground);margin-top:18px;max-width:1100px}.eyebrow{font-size:18px;color:var(--primary);margin-bottom:16px;font-weight:600}.accent{color:var(--primary)}.muted{color:var(--muted-foreground)}.split{display:grid;grid-template-columns:1fr 1fr;gap:64px}.three{display:grid;grid-template-columns:repeat(3,1fr);gap:38px}.column{border-top:2px solid var(--border);padding-top:24px}.column p{margin-top:14px;color:var(--muted-foreground);max-width:580px}.takeaway{border-top:1px solid var(--border);padding-top:22px;font-size:28px;font-weight:550}.source{font-size:18px;color:var(--muted-foreground)}.source a{color:var(--muted-foreground);text-underline-offset:4px}.flow{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:32px 0}.node{flex:1;border-top:3px solid var(--border);padding-top:20px;font-size:30px;font-weight:600}.node small{display:block;font-size:21px;color:var(--muted-foreground);font-weight:400;margin-top:10px}.node.good{border-color:var(--primary)}.arrow{font-size:36px;color:var(--muted-foreground)}.arrow.blocked{color:var(--destructive)}.big{font-size:clamp(65px,7vw,116px);line-height:1.1;letter-spacing:-.04em;font-weight:650}.equation{display:flex;align-items:center;gap:34px;margin:15px 0}.equation .arrow{font-size:48px}.fine{font-size:20px;color:var(--muted-foreground)}.route{display:grid;grid-template-columns:190px 1fr;gap:24px;align-items:center;border-top:1px solid var(--border);padding:22px 0}.route strong{font-size:27px}.route .track{display:flex;align-items:center;gap:22px;font-size:26px}.result{color:var(--primary);margin-left:auto;font-weight:600}.steps{display:grid;grid-template-columns:1fr 1fr;gap:26px 64px;counter-reset:beat}.beat{border-top:1px solid var(--border);padding-top:20px}.beat h3:before{counter-increment:beat;content:counter(beat,decimal-leading-zero) '  ';color:var(--primary)}.beat p{color:var(--muted-foreground);margin-top:10px}.button{display:inline-block;background:var(--primary);color:var(--primary-foreground);font-weight:600;border:1px solid var(--primary);padding:14px 24px;border-radius:7px;text-decoration:none}.actions{display:flex;gap:28px;align-items:center}.contract{display:flex;justify-content:space-between;gap:28px;padding:22px 0;border-top:1px solid var(--border)}.contract strong{font-size:28px;min-width:160px}.contract p{max-width:880px;color:var(--muted-foreground)}footer{min-height:72px;padding:14px 40px;display:flex;align-items:center;gap:28px;border-top:1px solid var(--border);font-size:18px;color:var(--muted-foreground);flex:none}.progress{display:flex;gap:12px;margin-left:auto}.progress a{width:12px;height:12px;border:1px solid var(--muted-foreground);border-radius:50%}.progress a[aria-current=step]{background:var(--primary);border-color:var(--primary)}.controls{display:flex;align-items:center;gap:18px}.controls button{width:46px;height:42px;border:1px solid var(--border);border-radius:7px;background:var(--card);color:var(--foreground)}#counter{min-width:45px;text-align:center}@media(max-height:850px) and (min-width:801px){.slide{gap:22px;padding-top:24px;padding-bottom:24px}.flow{padding:16px 0}.column{padding-top:20px}}@media(max-width:1200px){.slide{padding:30px 36px;gap:24px}.split{gap:32px}.route{grid-template-columns:145px 1fr}.route .track{font-size:23px}.keyboard{display:none}.three{gap:24px}}@media(max-width:800px){body{font-size:20px}.top{padding:0 24px}.top .topic{display:none}.slide{padding:28px 24px}.split,.three,.steps{grid-template-columns:1fr;gap:24px}.flow{flex-wrap:wrap}.node{min-width:140px}.route{grid-template-columns:1fr;gap:8px}.route .track{flex-wrap:wrap}.contract{flex-direction:column;gap:8px}footer{padding:12px 20px;gap:16px}.progress{display:none}.equation{gap:20px}}@media print{body{height:auto;overflow:visible;background:white;color:black}.top,footer{display:none}main{overflow:visible}.slide,.slide.on{display:flex;min-height:95vh;break-after:page}.slide[inert]{visibility:visible}.source,.lead,.muted,.column p,.beat p,.fine,.contract p,.node small{color:#444}a,.accent,.result,.eyebrow{color:#146b49}.button{color:black;background:white;border-color:#444}}
+</style>
+</head>
+<body>
+<header class="top"><a class="logo" href="index.html">HomeServer</a><span class="topic">Webhooks &amp; polling · Acosta &amp; Madrid</span><button class="theme-toggle" aria-label="Switch to light mode" title="Switch to light mode" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true"><circle cx="12" cy="12" r="4"/></svg></button></header>
+<main aria-label="Presentation">
+<section class="slide" id="slide-1" aria-labelledby="title-1">
+<div><p class="eyebrow">After the payment</p><h1 id="title-1">The customer paid.<br>Did the business finish?</h1><p class="lead">Payment, notification, and fulfillment are separate steps.</p></div>
+<div class="flow" aria-label="Payment received, then notification, then fulfillment"><div class="node good">Payment received<small>A business fact</small></div><span class="arrow" aria-hidden="true">→</span><div class="node">Notification delivered<small>A message about that fact</small></div><span class="arrow" aria-hidden="true">→</span><div class="node">Order fulfilled<small>The business acts on it</small></div></div>
+<p class="takeaway">A reliable workflow must connect all three.</p><p class="source">HomeServer teaching model · <a href="https://docs.stripe.com/checkout/fulfillment.md?payment-ui=stripe-hosted" target="_blank" rel="noopener">Stripe fulfillment guidance ↗</a></p>
+</section>
+<section class="slide" id="slide-2" aria-labelledby="title-2" inert>
+<div><p class="eyebrow">Two ways to discover work</p><h2 id="title-2">Send a notification, or check on a schedule</h2></div>
+<div class="split"><div class="column"><h3>Webhook</h3><p>A subscribed event triggers a message to your receiver.</p><div class="flow"><div class="node good">Payment</div><span class="arrow" aria-hidden="true">→</span><div class="node">Receiver</div></div><p class="fine">Useful when work should start soon after an event.</p></div><div class="column"><h3>Polling</h3><p>A scheduled job asks what changed since its last check.</p><div class="flow"><div class="node">Scheduled job</div><span class="arrow" aria-hidden="true">→</span><div class="node good">Paid orders</div></div><p class="fine">A change just after a check waits for the next one.</p></div></div>
+<p class="takeaway">Use the event for speed; use checks where the workflow needs them.</p><p class="source"><a href="https://shopify.dev/docs/apps/build/webhooks" target="_blank" rel="noopener">Shopify: webhooks and reconciliation ↗</a></p>
+</section>
+<section class="slide" id="slide-3" aria-labelledby="title-3" inert>
+<div><p class="eyebrow">Twice</p><h2 id="title-3">Repeat the message.<br>Keep the business effect once.</h2><p class="lead">Recognize the same logical operation, and protect its state change.</p></div>
+<div class="equation"><div><div class="big">2</div><p class="muted">deliveries</p></div><span class="arrow" aria-hidden="true">→</span><div><div class="big accent">1</div><p class="muted">invoice</p></div></div>
+<p class="takeaway">HomeServer: the same event reaches an already fulfilled order.</p><p class="source">Idempotency: repeating the operation adds no further effect. <a href="https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/" target="_blank" rel="noopener">AWS engineering guidance ↗</a></p>
+</section>
+<section class="slide" id="slide-4" aria-labelledby="title-4" inert>
+<div><p class="eyebrow">Never</p><h2 id="title-4">Payment can succeed while notification fails</h2><p class="lead">A recovery check finds paid orders that still need fulfillment.</p></div>
+<div><div class="route"><strong>First attempt</strong><div class="track"><span>Paid order</span><span class="arrow blocked" aria-hidden="true">×</span><span>Receiver unavailable</span><span class="result">Pending</span></div></div><div class="route"><strong>Later check</strong><div class="track"><span>Paid, unfinished order</span><span class="arrow" aria-hidden="true">→</span><span>Reconciliation</span><span class="result">Fulfilled</span></div></div></div>
+<p class="takeaway">HomeServer pauses the regular poller so recovery is visible.</p><p class="source"><a href="https://shopify.dev/docs/apps/build/webhooks" target="_blank" rel="noopener">Shopify recommends reconciliation for missed updates ↗</a></p>
+</section>
+<section class="slide" id="slide-5" aria-labelledby="title-5" inert>
+<div><p class="eyebrow">Documented examples</p><h2 id="title-5">Check the provider's delivery contract</h2></div>
+<div><div class="contract"><strong>Stripe</strong><p>Documents retries and duplicate events.</p></div><div class="contract"><strong>Shopify</strong><p>Recommends reconciliation when updates are missed.</p></div><div class="contract"><strong>GitHub</strong><p>Does not automatically redeliver failed webhook deliveries.</p></div></div>
+<p class="takeaway">A retry policy is service-specific. Recovery is an integration decision.</p><p class="source">Primary docs: <a href="https://docs.stripe.com/webhooks" target="_blank" rel="noopener">Stripe ↗</a> · <a href="https://shopify.dev/docs/apps/build/webhooks" target="_blank" rel="noopener">Shopify ↗</a> · <a href="https://docs.github.com/en/webhooks/using-webhooks/handling-failed-webhook-deliveries" target="_blank" rel="noopener">GitHub ↗</a></p>
+</section>
+<section class="slide" id="slide-6" aria-labelledby="title-6" inert>
+<div><p class="eyebrow">A condition without a payment event</p><h2 id="title-6">Some work starts with a question</h2><p class="lead">“Is stock below the reorder threshold?”</p></div>
+<div class="three"><div class="column"><h3>Check on a clock</h3><p>Evaluate the current stock against the threshold.</p></div><div class="column"><div class="big">3 &lt; 5</div><p>Stock is below the configured threshold.</p></div><div class="column"><h3 class="accent">Issue one alert</h3><p>Further checks recognize that this episode was handled.</p></div></div>
+<p class="takeaway">This demo checks a condition. Real inventory systems can also publish events.</p><p class="source">HomeServer Inventory model · an internal alert record, with no supplier order</p>
+</section>
+<section class="slide" id="slide-7" aria-labelledby="title-7" inert>
+<div><p class="eyebrow">Live demo · HomeServer</p><h2 id="title-7">Follow the customer and the Back Office</h2><p class="lead">Watch fulfillment source, delivery attempts, and the invoice count.</p></div>
+<div class="steps"><div class="beat"><h3>Speed</h3><p>Pay → webhook fulfills → poll finds zero.</p></div><div class="beat"><h3>Twice</h3><p>Resend → attempts increase → invoice stays one.</p></div><div class="beat"><h3>Never</h3><p>Delivery and polling Off → paid but pending → recovery.</p></div><div class="beat"><h3>Condition</h3><p>Arm low-stock alert → check → one alert.</p></div></div>
+<div class="actions"><a class="button" href="index.html" target="_blank" rel="noopener">Open HomeServer →</a><span class="fine">Use the prepared Local Sim rehearsal.</span></div><p class="source">Mock payment flow · live integration setup is a separate check</p>
+</section>
+<section class="slide" id="slide-8" aria-labelledby="title-8" inert>
+<div><p class="eyebrow">Design the workflow around unfinished work</p><h2 id="title-8">React quickly.<br>Handle repeats safely.<br>Recover what was missed.</h2></div>
+<div class="three"><div class="column"><h3>Webhook</h3><p>Start from a notification.</p></div><div class="column"><h3>Shared fulfillment rule</h3><p>Let the first valid claim do the work.</p></div><div class="column"><h3>Scheduled checks</h3><p>Find unfinished work and evaluate conditions.</p></div></div>
+<p class="takeaway">Ask: what if it arrives twice, or never arrives?</p><p class="source">Questions? · <a href="https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/" target="_blank" rel="noopener">Safe retries ↗</a> · <a href="https://shopify.dev/docs/apps/build/webhooks" target="_blank" rel="noopener">Reconciliation ↗</a></p>
+</section>
+</main>
+<footer><span class="keyboard">← → / Space · F for fullscreen</span><nav class="progress" aria-label="Choose slide"></nav><div class="controls"><button id="prev" aria-label="Previous slide">←</button><span id="counter" aria-live="polite">1 / 8</span><button id="next" aria-label="Next slide">→</button></div></footer>
+<script>
+// Static teaching diagrams: no payment model, backend calls, or cart writes.
+const slides = [...document.querySelectorAll('.slide')];
+const progress = document.querySelector('.progress');
+let current = 0;
+slides.forEach((slide, index) => {
+  const link = document.createElement('a');
+  link.href = '#slide-' + (index + 1);
+  link.setAttribute('aria-label', 'Slide ' + (index + 1) + ': ' + slide.querySelector('h1,h2').textContent);
+  progress.append(link);
+});
+function show(index, updateHash = true) {
+  current = Math.max(0, Math.min(slides.length - 1, index));
+  slides.forEach((slide, i) => { slide.classList.toggle('on', i === current); slide.inert = i !== current; });
+  [...progress.children].forEach((link, i) => { if (i === current) link.setAttribute('aria-current', 'step'); else link.removeAttribute('aria-current'); });
+  document.getElementById('counter').textContent = (current + 1) + ' / ' + slides.length;
+  document.getElementById('prev').disabled = current === 0;
+  document.getElementById('next').disabled = current === slides.length - 1;
+  document.querySelector('main').scrollTop = 0;
+  if (updateHash) history.replaceState(null, '', '#slide-' + (current + 1));
+}
+function fromHash() {
+  const match = location.hash.match(/^#slide-(\d+)$/);
+  show(match ? Number(match[1]) - 1 : 0, false);
+}
+window.addEventListener('hashchange', fromHash);
+document.getElementById('prev').onclick = () => show(current - 1);
+document.getElementById('next').onclick = () => show(current + 1);
+document.addEventListener('keydown', async event => {
+  if (event.altKey || event.ctrlKey || event.metaKey || event.target.closest('input,textarea,select,[contenteditable="true"]')) return;
+  if (event.key === ' ' && event.target.closest('button,a')) return;
+  if (['ArrowRight','PageDown',' ','ArrowLeft','PageUp','Home','End'].includes(event.key)) event.preventDefault();
+  if (['ArrowRight','PageDown',' '].includes(event.key)) show(current + 1);
+  if (['ArrowLeft','PageUp'].includes(event.key)) show(current - 1);
+  if (event.key === 'Home') show(0);
+  if (event.key === 'End') show(slides.length - 1);
+  if (event.key.toLowerCase() === 'f') {
+    try { if (document.fullscreenElement) await document.exitFullscreen(); else await document.documentElement.requestFullscreen(); } catch (_) { /* Navigation remains usable if fullscreen is declined. */ }
+  }
+});
+fromHash();
+</script>
+</body>
+</html>

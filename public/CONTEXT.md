@@ -34,6 +34,10 @@ server route declared at repository root.
 - `theme.css` — local snapshot of Supabase’s official semantic colors and dark/light
   themes (source URLs and retrieval date are recorded in its header).
 - `demo-core.js` — shared pure domain logic, also required by the live server.
+- `webhooks-slides.html` — eight Back Office talk slides, with source links,
+  static diagrams, and a demo handoff. Uses local theme CSS and shared theme
+  behavior; it never loads the order model or changes the cart. Speaking notes
+  are in `../research/webhooks/presenter-notes.md`.
 - `slides.html` — six talk slides (Eric 1–4, Madrid 5–6), matching the
   storefront/checkout style. Self-contained teaching illustrations; no
   backend calls or cart writes. Arrow keys/Space/buttons navigate, F toggles
@@ -66,3 +70,8 @@ the security form’s hidden total. Reset remains scoped to the active rehearsal
 Shopping navigation: Cart is beside the customer catalog heading; Checkout is
 in its cart summary. Edit cart in payment returns to `index.html#cart`. These
 actions are absent from the global navbar, which stays identical across pages.
+
+Back Office slide checks: navigate all eight slides forward and backward,
+verify hash links, theme toggle, fullscreen control, and demo link, and inspect
+fit at 1920 × 1080 and 1366 × 768. Public research and the versioned operating
+guide live at `../research/webhooks/` and `../DEMO-GUIDE.md`.

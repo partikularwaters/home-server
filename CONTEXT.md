@@ -17,8 +17,9 @@ webhooks versus polling in Back Office, and Hidden/Protected browser security.
 | `scripts/serve-demo.js` | Dependency-free local static and API preview |
 | `build-config.js` | Build step: writes `public/config.js` from Vercel env vars |
 | `config.example.js` | Setup template for forkers (real keys stay out of git) |
+| `DEMO-GUIDE.md` | Versioned operating guide for both demonstrations |
 | `docs/DEMO-SCRIPT.md` | Internal runbook for both teaching flows |
-| `research/` | Public source-backed research companion (GitHub only; not deployed) |
+| `research/` | Public source-backed companions: browser security, and `webhooks/` for Back Office (GitHub only; not deployed) |
 | `docs/` | Local presenter preparation (gitignored; not deployed) |
 
 Factory (stable): `assets/`, `schema.sql`, `config.example.js`.
@@ -30,3 +31,7 @@ behavior is local until these changes are deployed and live services configured.
 
 - `public/CONTEXT.md` — the site's inputs, runtime deps, and checks.
 - `assets/CONTEXT.md` — art source → deployed copies pipeline.
+
+Back Office presentation: `public/webhooks-slides.html` is the eight-slide
+browser deck; `research/webhooks/presenter-notes.md` owns speaking cues and
+the live handoff. The original `public/slides.html` remains the security deck.

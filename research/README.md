@@ -49,3 +49,11 @@ No prevalence estimate, merchant-wide assessment, or guarantee that online
 checkouts are universally safe is made. Sources can change; review dates
 record when their relevant content was read. Summaries are paraphrases,
 not copies of the source publications.
+
+## Related HomeServer topic
+
+The separate [Webhooks, polling, and reliable fulfillment companion](webhooks/README.md)
+covers Back Office, with its own sources, implementation analysis, and slides.
+For the current navigation and both rehearsal flows, see the
+[presenter guide](../DEMO-GUIDE.md). The original source review above remains
+dated 2026-10-09; the newer companion records its own review date.

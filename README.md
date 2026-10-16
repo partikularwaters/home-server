@@ -4,6 +4,21 @@ A tiny demo store for two classroom demonstrations: webhooks versus polling,
 and browser input versus server-side checks. No real payments, invoices sent
 to customers, or goods shipped.
 
+## Presentation materials
+
+- [Presenter guide](DEMO-GUIDE.md): exact controls, expected results, speaking
+  cues, recovery steps, and the distinction between the two demos.
+- [Back Office public research](research/webhooks/README.md) and
+  [speaking notes](research/webhooks/presenter-notes.md).
+- [Back Office browser slides](public/webhooks-slides.html): open
+  `http://127.0.0.1:8080/webhooks-slides.html` after starting the preview server.
+  Eight slides, keyboard navigation, fullscreen, and the shared dark/light theme.
+- [Security public research](research/README.md) and
+  [security browser slides](public/slides.html): the original topic remains separate.
+
+Research and the guide are versioned in Git; they are outside the deployed
+`public/` directory. Slide decks are served with the site after deployment.
+
 ## Back Office: webhooks versus polling
 
 Open **Cart** beside the product list, then choose **Checkout** in its summary. This opens a conventional checkout with saved sample
