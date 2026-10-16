@@ -216,6 +216,8 @@
     document.getElementById('bo-live').setAttribute('aria-pressed', String(!local));
     document.getElementById('bo-live').disabled = busy || !ready || !liveToken;
     document.getElementById('bo-local').disabled = busy;
+    document.getElementById('bo-token').disabled = busy;
+    document.getElementById('bo-connect').disabled = busy;
     document.getElementById('bo-ready').textContent = ready ? 'Live server configured' : 'Local Sim available; connect to check Make Live';
     const engineNote = manualRuns
       ? 'S2 runs enabled checks in order. Make owns the schedule: 15 minutes in the verified rehearsal.'
@@ -237,7 +239,7 @@
       b.disabled = busy || !state || (b.closest('#focus-order-actions') && b.dataset.boAction !== 'scheduled' && !focusedOrder()) || (b.dataset.boAction === 'refire' && !focusedOrder()?.paid_at) || (b.dataset.boAction === 'scheduled' && (local || !manualRuns));
       b.title = b.dataset.boAction === 'scheduled' && !manualRuns ? 'Use Run once in Make → S2: Scheduled engine. Panel runs require Make API access.' : '';
     });
-    document.querySelectorAll('[data-focus-setting], .bo-settings input').forEach(el => el.disabled = busy || !state || (!local && !!el.closest('[data-local-only]')));
+    document.querySelectorAll('[data-focus-setting], .bo-controls input').forEach(el => el.disabled = busy || !state || (!local && !!el.closest('[data-local-only]')));
     renderPresentation();
   }
   function renderData() {
